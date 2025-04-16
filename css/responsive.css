@@ -1,0 +1,104 @@
+/* css/responsive.css */
+/* Ajustements responsives */
+
+@media (max-width: 768px) {
+    .nav-button span {
+        font-size: 0.7rem;
+    }
+    
+    .nav-button .icon {
+        font-size: 1.3rem;
+    }
+    
+    .services-container,
+    .games-grid,
+    .sub-games-grid,
+    .bookmakers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bookmaker-actions,
+    .premium-controls,
+    .config-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .prediction-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .prediction-result {
+        margin-top: 5px;
+    }
+    
+    .prediction-details {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .prediction-stat {
+        flex: 1 0 30%;
+    }
+    
+    .modal-content {
+        padding: 20px;
+    }
+    
+    .bookmaker-links {
+        gap: 10px;
+    }
+    
+    .baccarat-prediction {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .prediction-box.highlighted {
+        transform: scale(1);
+    }
+    
+    .apples-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .apple-case {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-button .icon {
+        font-size: 1.1rem;
+    }
+    
+    .nav-button span {
+        font-size: 0.6rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .game-card h3,
+    .service-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .game-icon,
+    .service-icon {
+        font-size: 2.5rem;
+    }
+    
+    .prediction-stat {
+        flex: 1 0 100%;
+        margin-bottom: 10px;
+    }
+    
+    .bookmaker-option {
+        min-width: 100%;
+    }
+}
