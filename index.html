@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetScale Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>BetScale Pro</h1>
+        </div>
+        
+        <div class="content-container">
+            <!-- Jeu Section -->
+            <section id="jeu-section" class="content-section active">
+                <h2>Jouer Maintenant</h2>
+                <div class="game-container">
+                    <div class="game-placeholder">
+                        <i class="fas fa-gamepad-alt"></i>
+                        <p>Commencez à jouer dès maintenant !</p>
+                        <button class="play-button">Jouer</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- VIP Section -->
+            <section id="vip-section" class="content-section">
+                <h2>Avantages VIP</h2>
+                <div class="vip-container">
+                    <div class="vip-card">
+                        <div class="vip-icon">👑</div>
+                        <h3>Plan Premium</h3>
+                        <ul>
+                            <li>Bonus quotidiens x3</li>
+                            <li>Support prioritaire</li>
+                            <li>Événements exclusifs</li>
+                            <li>Skins personnalisés</li>
+                        </ul>
+                        <button class="vip-button">Devenir VIP</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Services Section -->
+            <section id="services-section" class="content-section">
+                <h2>Nos Services</h2>
+                <div class="services-container">
+                    <div class="service-card">
+                        <div class="service-icon">🎲</div>
+                        <h3>Paris Sportifs</h3>
+                        <p>Découvrez nos paris sportifs avec des cotes imbattables et des promotions exclusives.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">🏆</div>
+                        <h3>Tournois</h3>
+                        <p>Participez à nos tournois quotidiens et hebdomadaires avec des prix incroyables.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">💰</div>
+                        <h3>Bonus</h3>
+                        <p>Profitez de nos bonus de bienvenue et de nos récompenses de fidélité.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Profil Section -->
+            <section id="profil-section" class="content-section">
+                <h2>Votre Profil</h2>
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-icon">👤</div>
+                        <div id="profile-name">Chargement...</div>
+                        <div id="profile-status" class="profile-status free">Plan Gratuit</div>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value" id="coins">0</span>
+                                <span class="stat-label">Jetons</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value" id="wins">0</span>
+                                <span class="stat-label">Victoires</span>
+                            </div>
+                        </div>
+                        <button class="upgrade-button">Passer Premium</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div class="nav-button active" data-section="jeu">
+                <div class="button-content">
+                    <div class="icon">🎮</div>
+                    <span>Jeu</span>
+                </div>
+            </div>
+            <div class="nav-button" data-section="vip">
+                <div class="button-content">
+                    <div class="icon vip-icon">👑</div>
+                    <span>VIP</span>
+                </div>
+            </div>
+            <div class="nav-button" data-section="services">
+                <div class="button-content">
+                    <div class="icon">🛠️</div>
+                    <span>Services</span>
+                </div>
+            </div>
+            <div class="nav-button" data-section="profil">
+                <div class="button-content">
+                    <div class="icon">👤</div>
+                    <span>Profil</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Bienvenue sur BetScale Pro</h2>
+            <p>Entrez votre nom pour continuer</p>
+            <input type="text" id="username-input" placeholder="Votre nom d'utilisateur">
+            <button id="login-button">Commencer</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
