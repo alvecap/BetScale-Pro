@@ -1,0 +1,123 @@
+/* css/modals.css */
+/* Styles pour les modals */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal h2 {
+    margin-bottom: 15px;
+}
+
+.modal p {
+    margin-bottom: 20px;
+    color: #777;
+}
+
+.modal input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.modal button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(74, 107, 253, 0.3);
+    transition: all 0.3s;
+}
+
+.modal button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(74, 107, 253, 0.4);
+}
+
+/* Bookmaker Registration Modal */
+.bookmaker-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.bookmaker-link-item {
+    background: linear-gradient(145deg, #f0f0f0, #ffffff);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.05),
+                -5px -5px 10px rgba(255, 255, 255, 0.8);
+}
+
+.bookmaker-link-item h3 {
+    margin-bottom: 10px;
+    color: var(--accent-color);
+}
+
+.bookmaker-link-item .promo-code {
+    margin-bottom: 10px;
+}
+
+.bookmaker-link-item .highlight {
+    font-weight: 700;
+    color: var(--accent-color);
+    background-color: rgba(255, 62, 62, 0.1);
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.bookmaker-link-button {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(46, 56, 86, 0.3);
+}
+
+.bookmaker-link-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(46, 56, 86, 0.4);
+}
