@@ -13,10 +13,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const coinsElement = document.getElementById('coins');
     const winsElement = document.getElementById('wins');
     
-    const discoverButtons = document.querySelectorAll('.discover-button');
-    const subGamesContainers = document.querySelectorAll('.sub-games-container');
+    // Game elements
+    const discoverButton = document.querySelector('.discover-button');
+    const startButton = document.querySelector('.start-button');
+    const gamesGrid = document.querySelector('.games-grid');
+    const fifaGames = document.getElementById('fifa-games');
+    const baccaratBookmakers = document.getElementById('baccarat-bookmakers');
     const backButtons = document.querySelectorAll('.back-button');
-    const startGameButtons = document.querySelectorAll('.start-game-button');
+    const selectGameButtons = document.querySelectorAll('.select-game-button');
+    const nextButton = document.getElementById('fifa-next-button');
     const selectBookmakerButtons = document.querySelectorAll('.select-bookmaker-button');
     const createAccountButton = document.querySelector('.create-account-button');
     const bookmakerModal = document.getElementById('bookmaker-modal');
@@ -25,6 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameTitle = document.getElementById('game-title');
     const gameContent = document.getElementById('game-content');
     const backToGamesButton = document.querySelector('.back-to-games-button');
+    
+    // Game state
+    let selectedFifaGame = null;
     
     // User data
     let userData = {
@@ -86,56 +94,73 @@ document.addEventListener('DOMContentLoaded', function() {
     upgradeButton.addEventListener('click', upgradeToPremium);
     vipButton.addEventListener('click', upgradeToPremium);
     
-    // Discover button click events (FIFA and Baccarat)
-    discoverButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const game = this.getAttribute('data-game');
-            
-            // Hide game cards
-            document.querySelector('.games-grid').style.display = 'none';
-            
-            // Show appropriate sub-games
-            if (game === 'fifa') {
-                document.getElementById('fifa-games').classList.add('active');
-                document.getElementById('fifa-games').style.animation = 'slideInRight 0.3s ease-in-out';
-            } else if (game === 'baccarat') {
-                document.getElementById('baccarat-bookmakers').classList.add('active');
-                document.getElementById('baccarat-bookmakers').style.animation = 'slideInRight 0.3s ease-in-out';
-            }
-        });
+    // FIFA: Découvrir button click event
+    discoverButton.addEventListener('click', function() {
+        gamesGrid.style.display = 'none';
+        fifaGames.classList.add('active');
+        fifaGames.style.animation = 'fadeIn 0.3s ease-in-out';
+    });
+    
+    // Baccarat: Commencer button click event
+    startButton.addEventListener('click', function() {
+        gamesGrid.style.display = 'none';
+        baccaratBookmakers.classList.add('active');
+        baccaratBookmakers.style.animation = 'fadeIn 0.3s ease-in-out';
     });
     
     // Back buttons
     backButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Hide all sub-games containers
-            subGamesContainers.forEach(container => container.classList.remove('active'));
+            const container = this.closest('.sub-games-container');
+            container.classList.remove('active');
+            gamesGrid.style.display = 'grid';
             
-            // Show game cards
-            document.querySelector('.games-grid').style.display = 'grid';
+            // Reset selected game when going back
+            selectedFifaGame = null;
+            selectGameButtons.forEach(btn => {
+                btn.parentElement.classList.remove('selected');
+                btn.textContent = 'Sélectionner';
+            });
+            nextButton.classList.add('disabled');
         });
     });
     
-    // Start game buttons (FIFA games)
-    startGameButtons.forEach(button => {
+    // Selection of FIFA game
+    selectGameButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const gameType = this.getAttribute('data-game');
+            const game = this.getAttribute('data-game');
             
-            // Hide sub-games
-            subGamesContainers.forEach(container => container.classList.remove('active'));
+            // Reset previous selection
+            selectGameButtons.forEach(btn => {
+                btn.parentElement.classList.remove('selected');
+                btn.textContent = 'Sélectionner';
+            });
             
-            // Show game interface
+            // Set new selection
+            this.parentElement.classList.add('selected');
+            this.textContent = 'Sélectionné ✓';
+            selectedFifaGame = game;
+            
+            // Enable next button
+            nextButton.classList.remove('disabled');
+        });
+    });
+    
+    // FIFA Next button
+    nextButton.addEventListener('click', function() {
+        if (selectedFifaGame) {
+            fifaGames.classList.remove('active');
             gameInterface.classList.add('active');
             
             // Set game title and load content
-            if (gameType === 'fifa-england') {
+            if (selectedFifaGame === 'fifa-england') {
                 gameTitle.textContent = 'FC24 4x4 - Angleterre';
                 loadFIFAGameContent('england');
-            } else if (gameType === 'fifa-master') {
+            } else if (selectedFifaGame === 'fifa-master') {
                 gameTitle.textContent = 'FC24 3x3 - Master League';
                 loadFIFAGameContent('master');
             }
-        });
+        }
     });
     
     // Select bookmaker buttons
@@ -144,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const bookmaker = this.getAttribute('data-bookmaker');
             
             // Hide bookmakers
-            document.getElementById('baccarat-bookmakers').classList.remove('active');
+            baccaratBookmakers.classList.remove('active');
             
             // Show game interface
             gameInterface.classList.add('active');
@@ -256,13 +281,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetGameView() {
         // Hide game interface and sub-games
         gameInterface.classList.remove('active');
-        subGamesContainers.forEach(container => container.classList.remove('active'));
+        fifaGames.classList.remove('active');
+        baccaratBookmakers.classList.remove('active');
         
         // Show game cards
-        document.querySelector('.games-grid').style.display = 'grid';
+        gamesGrid.style.display = 'grid';
         
         // Clear game content
         gameContent.innerHTML = '';
+        
+        // Reset selected game when going back
+        selectedFifaGame = null;
+        selectGameButtons.forEach(btn => {
+            btn.parentElement.classList.remove('selected');
+            btn.textContent = 'Sélectionner';
+        });
+        nextButton.classList.add('disabled');
     }
     
     function loadFIFAGameContent(league) {
@@ -368,8 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 bonusMessage.classList.add('pulse');
             }, 500);
-        }, 2000);
-    }
+        }, 2000);}
     
     function createPredictionCards(matches) {
         matches.forEach(match => {
@@ -596,29 +629,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 3D Effects using Three.js
     function initThreeJS() {
-        // This is a simplified version that adds subtle 3D effects to the UI
-        // In a complete implementation, you'd want to create more complex 3D elements
-        
         // Add hover effect to buttons for 3D feel
         document.querySelectorAll('button').forEach(button => {
             button.addEventListener('mouseover', function() {
-                this.style.transform = 'translateY(-3px) scale(1.03)';
-                this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                if (!this.classList.contains('disabled')) {
+                    this.style.transform = 'translateY(-3px) scale(1.03)';
+                    this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                }
             });
             
             button.addEventListener('mouseout', function() {
-                this.style.transform = '';
-                this.style.boxShadow = '';
+                if (!this.classList.contains('disabled')) {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                }
             });
             
             button.addEventListener('mousedown', function() {
-                this.style.transform = 'translateY(1px) scale(0.98)';
-                this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                if (!this.classList.contains('disabled')) {
+                    this.style.transform = 'translateY(1px) scale(0.98)';
+                    this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                }
             });
             
             button.addEventListener('mouseup', function() {
-                this.style.transform = 'translateY(-3px) scale(1.03)';
-                this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                if (!this.classList.contains('disabled')) {
+                    this.style.transform = 'translateY(-3px) scale(1.03)';
+                    this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                }
             });
         });
         
@@ -668,6 +706,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.transform = '';
             });
         });
+        
+        // Add 3D effect to sub-game cards
+        document.querySelectorAll('.sub-game-card').forEach(card => {
+            card.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const deltaX = (x - centerX) / 20;
+                const deltaY = (y - centerY) / 20;
+                
+                this.style.transform = `perspective(1000px) rotateX(${-deltaY}deg) rotateY(${deltaX}deg) translateY(-5px)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (this.classList.contains('selected')) {
+                    this.style.transform = 'translateY(-5px)';
+                } else {
+                    this.style.transform = '';
+                }
+            });
+        });
+        
+        // Add similar effect to bookmaker cards
+        document.querySelectorAll('.bookmaker-card').forEach(card => {
+            card.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const deltaX = (x - centerX) / 20;
+                const deltaY = (y - centerY) / 20;
+                
+                this.style.transform = `perspective(1000px) rotateX(${-deltaY}deg) rotateY(${deltaX}deg) translateY(-5px)`;
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
     }
     
     // Add shake animation for invalid input
@@ -675,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.remove('shake');
     });
     
-    // Add CSS for shake animation
+    // Add CSS for animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes shake {
@@ -715,27 +799,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
-    
-    // Add 3D tilt effect to service cards
-    document.querySelectorAll('.service-card').forEach(card => {
-        card.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const deltaX = (x - centerX) / 30;
-            const deltaY = (y - centerY) / 30;
-            
-            this.style.transform = `perspective(1000px) rotateX(${-deltaY}deg) rotateY(${deltaX}deg) translateZ(10px)`;
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
-        });
-    });
     
     // Initialize with the default section (Jeu)
     document.querySelector('.nav-button[data-section="jeu"]').classList.add('active');
@@ -822,63 +885,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call on load and on resize
     adjustForScreenSize();
     window.addEventListener('resize', adjustForScreenSize);
-    
-    // Add dynamic loading effect for content sections
-    navButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const section = this.getAttribute('data-section');
-            const targetSection = document.getElementById(`${section}-section`);
-            
-            // Reset animation
-            targetSection.style.animation = 'none';
-            targetSection.offsetHeight; // Trigger reflow
-            targetSection.style.animation = 'fadeIn 0.3s ease-in-out';
-        });
-    });
-    
-    // Easter egg - Konami code
-    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-    let konamiIndex = 0;
-    
-    document.addEventListener('keydown', function(e) {
-        // Check if the key matches the expected key in the sequence
-        if (e.key === konamiCode[konamiIndex]) {
-            konamiIndex++;
-            
-            // If the entire sequence is matched
-            if (konamiIndex === konamiCode.length) {
-                // Activate easter egg - bonus coins
-                userData.coins += 1000;
-                saveUserData();
-                updateProfileUI();
-                
-                // Show a fun animation
-                const easterEggDiv = document.createElement('div');
-                easterEggDiv.style.position = 'fixed';
-                easterEggDiv.style.top = '0';
-                easterEggDiv.style.left = '0';
-                easterEggDiv.style.width = '100%';
-                easterEggDiv.style.height = '100%';
-                easterEggDiv.style.backgroundColor = 'rgba(0,0,0,0.8)';
-                easterEggDiv.style.color = 'gold';
-                easterEggDiv.style.fontSize = '3rem';
-                easterEggDiv.style.display = 'flex';
-                easterEggDiv.style.justifyContent = 'center';
-                easterEggDiv.style.alignItems = 'center';
-                easterEggDiv.style.zIndex = '9999';
-                easterEggDiv.textContent = '🎮 CODE SECRET ACTIVÉ! +1000 JETONS! 🎮';
-                document.body.appendChild(easterEggDiv);
-                
-                setTimeout(() => {
-                    document.body.removeChild(easterEggDiv);
-                }, 3000);
-                
-                // Reset the counter
-                konamiIndex = 0;
-            }
-        } else {
-            // Reset if wrong key
-            konamiIndex = 0;
-        }
-    });
 });
