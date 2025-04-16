@@ -1,0 +1,351 @@
+/* css/premium-games.css */
+/* Styles pour les jeux premium */
+
+/* VIP Section */
+.vip-banner {
+    background: linear-gradient(135deg, var(--secondary-color), #1a1f30);
+    color: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.vip-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: #2e3856;
+    border-radius: 50px;
+    padding: 5px 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.vip-banner p {
+    font-size: 1.1rem;
+}
+
+.vip-games {
+    margin-bottom: 40px;
+}
+
+.premium-card {
+    background: linear-gradient(145deg, #f5f0ff, #f0f5ff);
+    border: 1px solid rgba(156, 39, 176, 0.2);
+    position: relative;
+}
+
+.premium-marker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--premium-purple), #7b1fa2);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 0 10px 0 10px;
+}
+
+.premium-button {
+    background: linear-gradient(135deg, var(--premium-purple), #7b1fa2);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(156, 39, 176, 0.3);
+}
+
+.premium-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(156, 39, 176, 0.4);
+}
+
+.premium-desc {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+/* Premium Game Interface */
+.premium-interface {
+    background: linear-gradient(145deg, #f5f0ff, #f0f5ff);
+    border: 1px solid rgba(156, 39, 176, 0.2);
+}
+
+.premium-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Apple of Fortune */
+.apple-config {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.config-item {
+    background-color: rgba(156, 39, 176, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.config-item label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+#apple-time {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.bookmakers-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.bookmaker-option {
+    flex: 1;
+    min-width: 150px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.bookmaker-option input[type="radio"] {
+    margin-right: 8px;
+}
+
+.config-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Apple of Fortune Game Elements */
+.apples-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    position: relative;
+}
+
+.apple-case {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #f0f0f0, #ffffff);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.05),
+                -5px -5px 10px rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.apple-icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.apple-case.selected {
+    background: linear-gradient(145deg, #f5f0ff, #f0f5ff);
+    border: 2px solid var(--premium-purple);
+}
+
+.apple-case.selected .apple-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.scanner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(transparent, rgba(156, 39, 176, 0.2), transparent);
+    opacity: 0;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+.scanning .scanner {
+    animation: scan 5s linear forwards;
+}
+
+@keyframes scan {
+    0% {
+        opacity: 0;
+        left: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        left: calc(100% - 80px);
+    }
+}
+
+.result-message {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--premium-purple);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+}
+
+.result-visible .result-message {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.palier-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.palier-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ddd;
+}
+
+.palier-dot.active {
+    background-color: var(--premium-purple);
+    transform: scale(1.2);
+}
+
+.palier-message {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(156, 39, 176, 0.1);
+    border-left: 4px solid var(--premium-purple);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #555;
+    display: none;
+}
+
+.palier-message.visible {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* VIP Upgrade Container */
+.vip-upgrade-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.vip-card {
+    background: linear-gradient(135deg, #2e3856, #1a1f30);
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.vip-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 80%);
+    transform: rotate(0deg);
+    pointer-events: none;
+}
+
+.vip-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+}
+
+.vip-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: var(--vip-gold);
+}
+
+.vip-card ul {
+    list-style: none;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.vip-card ul li {
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 25px;
+}
+
+.vip-card ul li::before {
+    content: '✓';
+    color: var(--vip-gold);
+    position: absolute;
+    left: 0;
+}
+
+.vip-button {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: #2e3856;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    transition: all 0.3s;
+}
+
+.vip-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.4);
+}
