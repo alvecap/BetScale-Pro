@@ -18,12 +18,80 @@
             <!-- Jeu Section -->
             <section id="jeu-section" class="content-section active">
                 <h2>Jouer Maintenant</h2>
-                <div class="game-container">
-                    <div class="game-placeholder">
-                        <i class="fas fa-gamepad-alt"></i>
-                        <p>Commencez à jouer dès maintenant !</p>
-                        <button class="play-button">Jouer</button>
+                <div class="games-grid">
+                    <!-- Expert FIFA Game Card -->
+                    <div class="game-card">
+                        <div class="game-icon">⚽</div>
+                        <h3>Expert FIFA</h3>
+                        <p>Obtenez les meilleures prédictions pour vos paris sur FIFA avec notre système d'IA avancé. Maximisez vos gains!</p>
+                        <button class="discover-button" data-game="fifa">Découvrir</button>
                     </div>
+                    
+                    <!-- Baccarat Game Card -->
+                    <div class="game-card">
+                        <div class="game-icon">🃏</div>
+                        <h3>Baccarat</h3>
+                        <p>Stratégies et prédictions pour le Baccarat. Notre système analyse les tendances pour des résultats optimaux.</p>
+                        <button class="discover-button" data-game="baccarat">Découvrir</button>
+                    </div>
+                </div>
+                
+                <!-- FIFA Sub-Games (Hidden by default) -->
+                <div id="fifa-games" class="sub-games-container">
+                    <h3>Choisissez votre championnat</h3>
+                    <div class="sub-games-grid">
+                        <div class="sub-game-card">
+                            <div class="sub-game-icon">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+                            <h4>FC24 4x4 - Angleterre</h4>
+                            <p>Prédictions pour les matchs 4x4 du championnat anglais.</p>
+                            <button class="start-game-button" data-game="fifa-england">Commencer</button>
+                        </div>
+                        <div class="sub-game-card">
+                            <div class="sub-game-icon">🌍</div>
+                            <h4>FC24 3x3 - Master League</h4>
+                            <p>Prédictions pour les matchs 3x3 de la Master League internationale.</p>
+                            <button class="start-game-button" data-game="fifa-master">Commencer</button>
+                        </div>
+                    </div>
+                    <button class="back-button">Retour</button>
+                </div>
+                
+                <!-- Baccarat Bookmaker Selection (Hidden by default) -->
+                <div id="baccarat-bookmakers" class="sub-games-container">
+                    <h3>Choisissez votre bookmaker</h3>
+                    <div class="bookmakers-grid">
+                        <div class="bookmaker-card">
+                            <div class="bookmaker-logo">MELBET</div>
+                            <p>Leader mondial des paris sportifs avec des cotes imbattables.</p>
+                            <div class="promo-code">Code Promo: <span>ALVE13</span></div>
+                            <button class="select-bookmaker-button" data-bookmaker="melbet">Sélectionner</button>
+                        </div>
+                        <div class="bookmaker-card">
+                            <div class="bookmaker-logo">888STARZ</div>
+                            <p>Une large gamme de marchés avec des bonus exclusifs.</p>
+                            <div class="promo-code">Code Promo: <span>VEROL3</span></div>
+                            <button class="select-bookmaker-button" data-bookmaker="888starz">Sélectionner</button>
+                        </div>
+                        <div class="bookmaker-card">
+                            <div class="bookmaker-logo">MEGAPARI</div>
+                            <p>Options de paris avancées et interface conviviale.</p>
+                            <div class="promo-code">Code Promo: <span>ALVE10</span></div>
+                            <button class="select-bookmaker-button" data-bookmaker="megapari">Sélectionner</button>
+                        </div>
+                    </div>
+                    <div class="bookmaker-actions">
+                        <button class="create-account-button">Créer un compte</button>
+                        <button class="back-button">Retour</button>
+                    </div>
+                </div>
+                
+                <!-- Game Interface (Hidden by default) -->
+                <div id="game-interface" class="game-interface-container">
+                    <h3 id="game-title">Titre du jeu</h3>
+                    <div id="game-content" class="game-content">
+                        <!-- Dynamic game content will be loaded here -->
+                    </div>
+                    <button class="back-to-games-button">Retour aux jeux</button>
                 </div>
             </section>
             
@@ -127,6 +195,32 @@
             <p>Entrez votre nom pour continuer</p>
             <input type="text" id="username-input" placeholder="Votre nom d'utilisateur">
             <button id="login-button">Commencer</button>
+        </div>
+    </div>
+    
+    <!-- Bookmaker Registration Modal -->
+    <div id="bookmaker-modal" class="modal">
+        <div class="modal-content">
+            <h2>Créer un compte</h2>
+            <p>Obtenez un bonus de 200% sur votre premier dépôt</p>
+            <div class="bookmaker-links">
+                <div class="bookmaker-link-item">
+                    <h3>MELBET</h3>
+                    <div class="promo-code">Code Promo: <span class="highlight">ALVE13</span></div>
+                    <a href="https://melbet.com" target="_blank" class="bookmaker-link-button">Visiter le site officiel</a>
+                </div>
+                <div class="bookmaker-link-item">
+                    <h3>888STARZ</h3>
+                    <div class="promo-code">Code Promo: <span class="highlight">VEROL3</span></div>
+                    <a href="https://888starz.com" target="_blank" class="bookmaker-link-button">Visiter le site officiel</a>
+                </div>
+                <div class="bookmaker-link-item">
+                    <h3>MEGAPARI</h3>
+                    <div class="promo-code">Code Promo: <span class="highlight">ALVE10</span></div>
+                    <a href="https://megapari.com" target="_blank" class="bookmaker-link-button">Visiter le site officiel</a>
+                </div>
+            </div>
+            <button id="close-bookmaker-modal">Fermer</button>
         </div>
     </div>
 
