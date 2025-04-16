@@ -1,0 +1,93 @@
+/* css/utilities.css */
+/* Animations et classes utilitaires */
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* css/utilities.css (suite) */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Loading animation */
+.loading-animation {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+    position: relative;
+}
+
+.loading-animation::after {
+    content: '...';
+    position: absolute;
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* Shake animation */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Transitions */
+.games-grid.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sub-games-container.fade-in {
+    display: block;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Bonus message style */
+.bonus-message {
+    padding: 10px 15px;
+    background-color: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 20px;
+    color: #4CAF50;
+}
