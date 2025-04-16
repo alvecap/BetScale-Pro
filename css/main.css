@@ -1,0 +1,11 @@
+/* css/main.css */
+/* Fichier principal qui importe tous les autres fichiers CSS */
+
+@import 'base.css';
+@import 'components.css';
+@import 'navigation.css';
+@import 'games.css';
+@import 'premium-games.css';
+@import 'modals.css';
+@import 'utilities.css';
+@import 'responsive.css';
