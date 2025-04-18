@@ -126,6 +126,8 @@ function setupEventListeners() {
     }
     
     // Select bookmaker buttons
+    // js/free-games.js (suite)
+    // Select bookmaker buttons
     selectBookmakerButtons.forEach(button => {
         button.addEventListener('click', function() {
             const bookmaker = this.getAttribute('data-bookmaker');
@@ -257,6 +259,12 @@ function loadBaccaratGameContent(bookmaker) {
             }, 500);
         });
         
+        // Optimiser l'animation 3D dans l'encadrement
+        const modelSphere = gameContent.querySelector('.model-sphere');
+        if (modelSphere) {
+            modelSphere.style.animation = 'rotate 6s infinite linear';
+        }
+        
         // Après l'animation, afficher les résultats
         setTimeout(() => {
             clearInterval(statusInterval);
@@ -318,13 +326,25 @@ function loadBaccaratGameContent(bookmaker) {
             
             gameContent.innerHTML = resultsHTML;
             
-            // Add result buttons
+            // Add result buttons with improved styling
             const resultButtons = document.createElement('div');
             resultButtons.className = 'result-buttons';
+            resultButtons.style.display = 'flex';
+            resultButtons.style.justifyContent = 'center';
+            resultButtons.style.gap = '20px';
+            resultButtons.style.margin = '30px 0';
             
             const newPredictionButton = document.createElement('button');
             newPredictionButton.className = 'nav-button';
             newPredictionButton.textContent = 'Nouvelle prédiction';
+            newPredictionButton.style.fontSize = '1.1rem';
+            newPredictionButton.style.padding = '12px 25px';
+            newPredictionButton.style.backgroundColor = 'var(--primary-color)';
+            newPredictionButton.style.color = 'white';
+            newPredictionButton.style.border = 'none';
+            newPredictionButton.style.borderRadius = '50px';
+            newPredictionButton.style.cursor = 'pointer';
+            newPredictionButton.style.boxShadow = '0 4px 8px rgba(74, 107, 253, 0.3)';
             newPredictionButton.addEventListener('click', function() {
                 loadBaccaratGameContent(bookmaker);
             });
@@ -332,6 +352,14 @@ function loadBaccaratGameContent(bookmaker) {
             const homeButton = document.createElement('button');
             homeButton.className = 'nav-button';
             homeButton.textContent = 'Accueil';
+            homeButton.style.fontSize = '1.1rem';
+            homeButton.style.padding = '12px 25px';
+            homeButton.style.backgroundColor = 'var(--secondary-color)';
+            homeButton.style.color = 'white';
+            homeButton.style.border = 'none';
+            homeButton.style.borderRadius = '50px';
+            homeButton.style.cursor = 'pointer';
+            homeButton.style.boxShadow = '0 4px 8px rgba(46, 56, 86, 0.3)';
             homeButton.addEventListener('click', resetGameView);
             
             resultButtons.appendChild(newPredictionButton);
@@ -341,14 +369,17 @@ function loadBaccaratGameContent(bookmaker) {
             // Add bonus for generating predictions
             addCoins(5);
             
-            // Show bonus message
+            // Show bonus message with improved styling
             const bonusMessage = document.createElement('div');
             bonusMessage.className = 'bonus-message';
             bonusMessage.textContent = '+5 jetons pour avoir utilisé nos prédictions!';
             bonusMessage.style.textAlign = 'center';
             bonusMessage.style.marginTop = '20px';
+            bonusMessage.style.padding = '10px 15px';
+            bonusMessage.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
             bonusMessage.style.color = '#4CAF50';
             bonusMessage.style.fontWeight = 'bold';
+            bonusMessage.style.borderRadius = '8px';
             gameContent.appendChild(bonusMessage);
             
             // Animate the bonus message
