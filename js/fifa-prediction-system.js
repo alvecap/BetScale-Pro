@@ -3,8 +3,6 @@
 
 // État des questions et des réponses
 let predictionData = {
-    homeTeam: '',
-    awayTeam: '',
     odds: {
         home: 0,
         draw: 0,
@@ -36,8 +34,6 @@ const predictionSteps = [
         title: "Cotes classiques (1 - N - 2)",
         description: "Ces cotes serviront à identifier le favori du match.",
         fields: [
-            { id: "home-team", type: "text", label: "Équipe à domicile", placeholder: "Ex: Manchester United" },
-            { id: "away-team", type: "text", label: "Équipe à l'extérieur", placeholder: "Ex: Liverpool" },
             { id: "home-odds", type: "number", label: "Cote victoire domicile", placeholder: "Ex: 2.10", step: "0.01" },
             { id: "draw-odds", type: "number", label: "Cote match nul", placeholder: "Ex: 3.50", step: "0.01" },
             { id: "away-odds", type: "number", label: "Cote victoire extérieur", placeholder: "Ex: 3.20", step: "0.01" }
@@ -226,10 +222,6 @@ function renderCurrentStep() {
 function getFieldValue(fieldId) {
     // Get current value from predictionData based on field ID
     switch (fieldId) {
-        case 'home-team':
-            return predictionData.homeTeam;
-        case 'away-team':
-            return predictionData.awayTeam;
         case 'home-odds':
             return predictionData.odds.home || '';
         case 'draw-odds':
@@ -262,12 +254,6 @@ function getFieldValue(fieldId) {
 function updateFieldValue(fieldId, value) {
     // Update predictionData based on field ID
     switch (fieldId) {
-        case 'home-team':
-            predictionData.homeTeam = value;
-            break;
-        case 'away-team':
-            predictionData.awayTeam = value;
-            break;
         case 'home-odds':
             predictionData.odds.home = parseFloat(value) || 0;
             break;
@@ -373,11 +359,16 @@ function generatePrediction() {
         const newPredictionButton = document.createElement('button');
         newPredictionButton.className = 'nav-button';
         newPredictionButton.textContent = 'Nouvelle prédiction';
+        newPredictionButton.style.fontSize = '1.1rem';
+        newPredictionButton.style.padding = '12px 25px';
+        newPredictionButton.style.marginRight = '15px';
         newPredictionButton.addEventListener('click', resetPrediction);
         
         const homeButton = document.createElement('button');
         homeButton.className = 'nav-button';
         homeButton.textContent = 'Accueil';
+        homeButton.style.fontSize = '1.1rem';
+        homeButton.style.padding = '12px 25px';
         homeButton.addEventListener('click', goToHome);
         
         resultButtons.appendChild(newPredictionButton);
@@ -483,10 +474,10 @@ function calculatePrediction() {
     
     // Based on provided odds, determine the favorite
     if (predictionData.odds.home < predictionData.odds.away) {
-        winner = predictionData.homeTeam;
+        winner = "Équipe Domicile";
         winnerConfidence = Math.round((1 / predictionData.odds.home) * 100);
     } else if (predictionData.odds.away < predictionData.odds.home) {
-        winner = predictionData.awayTeam;
+        winner = "Équipe Extérieur";
         winnerConfidence = Math.round((1 / predictionData.odds.away) * 100);
     } else {
         winner = "Match nul";
@@ -519,15 +510,15 @@ function displayPredictionResults(results) {
     // Create results display
     const resultsHTML = `
         <div class="prediction-results">
-            <h3>Prédiction pour ${predictionData.homeTeam} vs ${predictionData.awayTeam}</h3>
+            <h3>Prédiction</h3>
             
             <div class="results-grid">
                 <div class="result-card exact-score">
                     <h4>Premier Score Exact</h4>
                     <div class="score-display">
-                        <span class="team-name">${predictionData.homeTeam}</span>
+                        <span class="team-name">Équipe Domicile</span>
                         <span class="score-value">${results.firstExactScore.home} - ${results.firstExactScore.away}</span>
-                        <span class="team-name">${predictionData.awayTeam}</span>
+                        <span class="team-name">Équipe Extérieur</span>
                     </div>
                     <div class="confidence-meter">
                         <div class="confidence-label">Confiance: ${results.firstScoreConfidence}%</div>
@@ -540,9 +531,9 @@ function displayPredictionResults(results) {
                 <div class="result-card exact-score">
                     <h4>Second Score Exact</h4>
                     <div class="score-display">
-                        <span class="team-name">${predictionData.homeTeam}</span>
+                        <span class="team-name">Équipe Domicile</span>
                         <span class="score-value">${results.secondExactScore.home} - ${results.secondExactScore.away}</span>
-                        <span class="team-name">${predictionData.awayTeam}</span>
+                        <span class="team-name">Équipe Extérieur</span>
                     </div>
                     <div class="confidence-meter">
                         <div class="confidence-label">Confiance: ${results.secondScoreConfidence}%</div>
