@@ -1,0 +1,87 @@
+/* css/admin.css */
+/* Styles pour l'interface administrateur */
+
+.profile-status.admin {
+    background: linear-gradient(135deg, #FF5722, #E91E63);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+}
+
+/* Badge administrateur dans la section VIP */
+.admin-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #FF5722, #E91E63);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-badge .admin-icon {
+    font-size: 1rem;
+}
+
+.admin-info {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: rgba(255, 87, 34, 0.1);
+    border-left: 3px solid #FF5722;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Surcharge des boutons premium pour l'administrateur */
+.admin-button {
+    background: linear-gradient(135deg, #FF5722, #E91E63);
+    box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+}
+
+.admin-button:hover {
+    box-shadow: 0 6px 12px rgba(233, 30, 99, 0.4);
+}
+
+/* Modification de l'interface pour l'admin */
+.admin-interface .premium-marker {
+    background: linear-gradient(135deg, #FF5722, #E91E63);
+}
+
+.admin-interface .premium-card {
+    border: 1px solid rgba(233, 30, 99, 0.2);
+}
+
+/* Modifications des popups d'information admin */
+.admin-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(255, 87, 34, 0.05);
+    border-radius: 8px;
+}
+
+.admin-controls button {
+    background: linear-gradient(135deg, #FF5722, #E91E63);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3);
+}
