@@ -1,0 +1,133 @@
+<!-- VIP Section -->
+<section id="vip-section" class="content-section">
+    <h2>Jeux Premium</h2>
+    <div class="vip-banner">
+        <div class="vip-badge">👑 PREMIUM</div>
+        <p>Accédez à nos prédictions les plus avancées et exclusives</p>
+    </div>
+    
+    <div class="games-grid vip-games">
+        <!-- Apple of Fortune Game Card -->
+        <div class="game-card premium-card">
+            <div class="premium-marker">premium</div>
+            <div class="game-icon">🍎</div>
+            <h3>Apple of Fortune</h3>
+            <p>Découvrez notre IA avancée qui prédit la bonne pomme parmi 5 cases grâce à des algorithmes d'analyse prédictive.</p>
+            <button class="start-button premium-button" data-game="apple">Commencer</button>
+        </div>
+        
+        <!-- God Mode Game Card -->
+        <div class="game-card premium-card">
+            <div class="premium-marker">premium</div>
+            <div class="game-icon">⚡</div>
+            <h3>God Mode</h3>
+            <p>Les prédictions les plus poussées sur le football avec une précision exceptionnelle grâce à notre base de données avancée.</p>
+            <button class="start-button premium-button" data-game="godmode">Commencer</button>
+        </div>
+        
+        <!-- Sega Football Game Card -->
+        <div class="game-card premium-card">
+            <div class="premium-marker">premium</div>
+            <div class="game-icon">🏆</div>
+            <h3>Sega Football</h3>
+            <p>Prédictions simplifiées pour les matchs de football virtuels à faible nombre de buts, idéal pour maximiser vos chances.</p>
+            <button class="start-button premium-button" data-game="sega">Commencer</button>
+        </div>
+    </div>
+    
+    <!-- Apple of Fortune Selection (Hidden by default) -->
+    <div id="apple-settings" class="sub-games-container">
+        <h3>Configuration - Apple of Fortune</h3>
+        <div class="apple-config">
+            <div class="config-item">
+                <label for="apple-time">Heure locale</label>
+                <input type="time" id="apple-time" value="12:00">
+                <small class="config-help">L'heure locale sert à ajuster les probabilités selon votre fuseau horaire</small>
+            </div>
+            <div class="config-item">
+                <label>Choisissez votre bookmaker</label>
+                <div class="bookmakers-select">
+                    <div class="bookmaker-option">
+                        <input type="radio" id="apple-melbet" name="apple-bookmaker" value="melbet">
+                        <label for="apple-melbet">MELBET</label>
+                    </div>
+                    <div class="bookmaker-option">
+                        <input type="radio" id="apple-888starz" name="apple-bookmaker" value="888starz">
+                        <label for="apple-888starz">888STARZ</label>
+                    </div>
+                    <div class="bookmaker-option">
+                        <input type="radio" id="apple-megapari" name="apple-bookmaker" value="megapari">
+                        <label for="apple-megapari">MEGAPARI</label>
+                    </div>
+                </div>
+                <small class="config-help">Les prédictions sont uniquement basées sur les bookmakers suivants : MELBET, 888STARZ, MEGAPARI.</small>
+            </div>
+        </div>
+        <div class="config-actions">
+            <button id="start-apple-prediction" class="premium-button">Obtenir la prédiction</button>
+            <button class="create-account-button">Créer un compte</button>
+            <button class="back-button">Retour</button>
+        </div>
+    </div>
+    
+    <!-- God Mode Selection (Hidden by default) -->
+    <div id="godmode-settings" class="sub-games-container">
+        <h3>Configuration - God Mode</h3>
+        <p class="premium-desc">Notre système d'IA le plus avancé pour les prédictions de football avec une précision exceptionnelle</p>
+        <div id="godmode-steps-container">
+            <!-- Les étapes seront générées dynamiquement par JavaScript -->
+        </div>
+        <div class="config-actions">
+            <button id="godmode-prev-button" class="premium-button secondary-button" style="display: none;">Précédent</button>
+            <button id="godmode-next-button" class="premium-button">Suivant</button>
+            <button id="start-godmode-prediction" class="premium-button" style="display: none;">Obtenir la prédiction</button>
+            <button class="back-button">Retour</button>
+        </div>
+    </div>
+    
+    <!-- Sega Football Selection (Hidden by default) -->
+    <div id="sega-settings" class="sub-games-container">
+        <h3>Configuration - Sega Football</h3>
+        <p class="premium-desc">Prédictions optimisées pour les matchs virtuels à <strong>faible nombre de buts</strong></p>
+        <div class="sega-info-box">
+            <div class="info-icon">ℹ️</div>
+            <div class="info-text">Ce jeu est réputé pour produire très peu de buts. Nos prédictions sont spécialement calibrées pour maximiser vos chances sur ce type de matchs.</div>
+        </div>
+        <div id="sega-steps-container">
+            <!-- Les étapes seront générées dynamiquement par JavaScript -->
+        </div>
+        <div class="config-actions">
+            <button id="sega-prev-button" class="premium-button secondary-button" style="display: none;">Précédent</button>
+            <button id="sega-next-button" class="premium-button">Suivant</button>
+            <button id="start-sega-prediction" class="premium-button" style="display: none;">Obtenir la prédiction</button>
+            <button class="back-button">Retour</button>
+        </div>
+    </div>
+    
+    <!-- Premium Game Interface (Hidden by default) -->
+    <div id="premium-game-interface" class="game-interface-container premium-interface">
+        <h3 id="premium-game-title">Titre du jeu</h3>
+        <div id="premium-game-content" class="game-content">
+            <!-- Dynamic game content will be loaded here -->
+        </div>
+        <div class="premium-controls">
+            <button id="premium-next-button" class="premium-button">Suivant</button>
+            <button id="premium-new-prediction-button" class="premium-button">Nouvelle prédiction</button>
+            <button id="premium-home-button" class="premium-button">Accueil</button>
+        </div>
+    </div>
+    
+    <div class="vip-upgrade-container">
+        <div class="vip-card">
+            <div class="vip-icon">👑</div>
+            <h3>Plan Premium</h3>
+            <ul>
+                <li>Accès à tous les jeux premium</li>
+                <li>Bonus quotidiens x3</li>
+                <li>Support prioritaire</li>
+                <li>Événements exclusifs</li>
+            </ul>
+            <button class="vip-button">Devenir VIP</button>
+        </div>
+    </div>
+</section>
