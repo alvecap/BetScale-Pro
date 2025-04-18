@@ -7,6 +7,9 @@ import { initFreeGames } from './free-games.js';
 import { initPremiumGames } from './premium-games.js';
 import { initUIEffects } from './ui-effects.js';
 
+// Importation du système de prédiction FIFA
+import './fifa-prediction-system.js';
+
 // Initialisation de l'application
 document.addEventListener('DOMContentLoaded', function() {
     // Initialiser les différentes parties de l'application
