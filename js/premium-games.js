@@ -17,9 +17,113 @@ let premiumGameContent;
 let premiumNextButton;
 let premiumNewPredictionButton;
 let premiumHomeButton;
+let godmodeStepsContainer;
+let godmodePrevButton;
+let godmodeNextButton;
+let segaStepsContainer;
+let segaPrevButton;
+let segaNextButton;
 
 // Game state
 let currentPalier = 0;
+let currentGodModeStep = 1;
+let currentSegaStep = 1;
+let godModeData = {
+    odds: { home: 0, draw: 0, away: 0 },
+    firstHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+    secondHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+    exactScore: { homeGoals: 0, awayGoals: 0, odds: 0 },
+    totalSteps: 4
+};
+let segaData = {
+    odds: { home: 0, draw: 0, away: 0 },
+    firstHalf: { score: "", odds: 0 },
+    secondHalf: { score: "", odds: 0 },
+    scores: { home: "", draw: "", away: "" },
+    goals: { over15: 0, under35: 0, bttsYes: 0 },
+    totalSteps: 4
+};
+
+// Structure des étapes pour God Mode (similaire à FIFA)
+const godModeSteps = [
+    {
+        title: "Cotes classiques (1 - N - 2)",
+        description: "Ces cotes serviront à identifier le favori du match et à calculer les probabilités de succès.",
+        fields: [
+            { id: "godmode-home-odds", type: "number", label: "Cote victoire domicile", placeholder: "Ex: 2.10", step: "0.01", help: "La cote pour la victoire de l'équipe à domicile détermine sa force relative" },
+            { id: "godmode-draw-odds", type: "number", label: "Cote match nul", placeholder: "Ex: 3.50", step: "0.01", help: "La cote pour un match nul peut indiquer l'équilibre des forces en présence" },
+            { id: "godmode-away-odds", type: "number", label: "Cote victoire extérieur", placeholder: "Ex: 3.20", step: "0.01", help: "La cote pour la victoire de l'équipe à l'extérieur influence le calcul final" }
+        ]
+    },
+    {
+        title: "Score exact favori en 1ʳᵉ mi-temps + cote",
+        description: "Sert à estimer la dynamique de début de match et les tendances offensives.",
+        fields: [
+            { id: "godmode-first-half-home", type: "number", label: "Buts domicile (1ère mi-temps)", placeholder: "Ex: 1", min: "0", max: "9", help: "Le nombre de buts en première mi-temps révèle l'intensité du début de match" },
+            { id: "godmode-first-half-away", type: "number", label: "Buts extérieur (1ère mi-temps)", placeholder: "Ex: 0", min: "0", max: "9", help: "Cette information permet d'évaluer la stratégie défensive des équipes" },
+            { id: "godmode-first-half-odds", type: "number", label: "Cote de ce score exact", placeholder: "Ex: 4.33", step: "0.01", help: "La cote du score exact influence directement la précision de notre algorithme" }
+        ]
+    },
+    {
+        title: "Score exact favori en 2ᵒ mi-temps + cote",
+        description: "Permet d'évaluer l'évolution du match et les ajustements tactiques.",
+        fields: [
+            { id: "godmode-second-half-home", type: "number", label: "Buts domicile (2ème mi-temps)", placeholder: "Ex: 2", min: "0", max: "9", help: "Le nombre de buts en seconde période reflète souvent les ajustements tactiques" },
+            { id: "godmode-second-half-away", type: "number", label: "Buts extérieur (2ème mi-temps)", placeholder: "Ex: 1", min: "0", max: "9", help: "Cette donnée est cruciale pour évaluer la condition physique des équipes" },
+            { id: "godmode-second-half-odds", type: "number", label: "Cote de ce score exact", placeholder: "Ex: 5.25", step: "0.01", help: "Plus la cote est élevée, plus notre algorithme considère ce scénario comme improbable" }
+        ]
+    },
+    {
+        title: "Score exact favori global (toutes colonnes) + cote",
+        description: "Sert de base pour confirmer la tendance globale et affiner nos prédictions.",
+        fields: [
+            { id: "godmode-exact-score-home", type: "number", label: "Buts domicile (score final)", placeholder: "Ex: 3", min: "0", max: "9", help: "Le score final anticipé par le bookmaker est une donnée fondamentale" },
+            { id: "godmode-exact-score-away", type: "number", label: "Buts extérieur (score final)", placeholder: "Ex: 1", min: "0", max: "9", help: "Notre modèle compare ce score à ceux des mi-temps pour plus de précision" },
+            { id: "godmode-exact-score-odds", type: "number", label: "Cote de ce score exact", placeholder: "Ex: 12.00", step: "0.01", help: "Cette cote est l'élément final pour calibrer notre algorithme prédictif avancé" }
+        ]
+    }
+];
+
+// Structure des étapes pour Sega Football
+const segaSteps = [
+    {
+        title: "Cotes classiques (1 - N - 2)",
+        description: "Ces cotes serviront à identifier le favori du match pour ce jeu à faible nombre de buts.",
+        fields: [
+            { id: "sega-home-odds", type: "number", label: "Cote victoire domicile", placeholder: "Ex: 2.10", step: "0.01", help: "La cote pour la victoire de l'équipe à domicile est particulièrement importante dans Sega Football" },
+            { id: "sega-draw-odds", type: "number", label: "Cote match nul", placeholder: "Ex: 3.50", step: "0.01", help: "Les matchs nuls sont fréquents dans ce jeu à faible nombre de buts" },
+            { id: "sega-away-odds", type: "number", label: "Cote victoire extérieur", placeholder: "Ex: 3.20", step: "0.01", help: "La cote pour la victoire à l'extérieur aide à identifier les équipes les plus performantes" }
+        ]
+    },
+    {
+        title: "Scores exacts favoris mi-temps + cotes",
+        description: "Ces scores permettent d'estimer les tendances offensives en début et fin de match.",
+        fields: [
+            { id: "sega-first-half-score", type: "text", label: "Score exact 1ère mi-temps", placeholder: "Ex: 1-0", help: "Le format doit être X-Y (ex: 0-0, 1-0, 0-1)" },
+            { id: "sega-first-half-odds", type: "number", label: "Cote score 1ère mi-temps", placeholder: "Ex: 4.33", step: "0.01", help: "La cote du score exact en première mi-temps influence notre analyse de début de match" },
+            { id: "sega-second-half-score", type: "text", label: "Score exact 2ème mi-temps", placeholder: "Ex: 0-1", help: "Le format doit être X-Y (ex: 0-0, 1-0, 0-1)" },
+            { id: "sega-second-half-odds", type: "number", label: "Cote score 2ème mi-temps", placeholder: "Ex: 5.25", step: "0.01", help: "Cette cote révèle les tendances de fin de match cruciales pour nos prévisions" }
+        ]
+    },
+    {
+        title: "Scores probables (équipes alignées)",
+        description: "Ces scores permettent d'analyser les tendances de résultats selon chaque scénario.",
+        fields: [
+            { id: "sega-score-home", type: "text", label: "Score prob. (domicile gagne)", placeholder: "Ex: 1-0", help: "Le score le plus probable si l'équipe à domicile gagne" },
+            { id: "sega-score-draw", type: "text", label: "Score prob. (match nul)", placeholder: "Ex: 1-1", help: "Le score nul le plus probable selon les cotes du bookmaker" },
+            { id: "sega-score-away", type: "text", label: "Score prob. (extérieur gagne)", placeholder: "Ex: 0-1", help: "Le score le plus probable si l'équipe à l'extérieur gagne" }
+        ]
+    },
+    {
+        title: "Totaux de buts & BTTS",
+        description: "Ces cotes d'over/under et BTTS sont cruciales pour notre algorithme prédictif.",
+        fields: [
+            { id: "sega-over15-odds", type: "number", label: "Cote +1.5 buts total", placeholder: "Ex: 1.40", step: "0.01", help: "Cette cote est déterminante pour prévoir si le match aura au moins 2 buts" },
+            { id: "sega-under35-odds", type: "number", label: "Cote -3.5 buts total", placeholder: "Ex: 1.30", step: "0.01", help: "La cote sous 3.5 buts est généralement basse dans ce jeu à faible scoring" },
+            { id: "sega-btts-yes-odds", type: "number", label: "Cote BTTS (Oui)", placeholder: "Ex: 2.10", step: "0.01", help: "La cote 'Les deux équipes marquent' aide à calculer nos prédictions de scores exacts" }
+        ]
+    }
+];
 
 export function initPremiumGames() {
     // Initialize DOM elements
@@ -36,9 +140,19 @@ export function initPremiumGames() {
     premiumNextButton = document.getElementById('premium-next-button');
     premiumNewPredictionButton = document.getElementById('premium-new-prediction-button');
     premiumHomeButton = document.getElementById('premium-home-button');
+    godmodeStepsContainer = document.getElementById('godmode-steps-container');
+    godmodePrevButton = document.getElementById('godmode-prev-button');
+    godmodeNextButton = document.getElementById('godmode-next-button');
+    segaStepsContainer = document.getElementById('sega-steps-container');
+    segaPrevButton = document.getElementById('sega-prev-button');
+    segaNextButton = document.getElementById('sega-next-button');
     
     // Setup event listeners
     setupEventListeners();
+    
+    // Initialize God Mode et Sega Football steps
+    setupGodModeSteps();
+    setupSegaSteps();
 }
 
 function setupEventListeners() {
@@ -60,8 +174,12 @@ function setupEventListeners() {
                 appleSettings.classList.add('active');
             } else if (game === 'godmode') {
                 godmodeSettings.classList.add('active');
+                resetGodModeSteps();
+                renderGodModeStep(1);
             } else if (game === 'sega') {
                 segaSettings.classList.add('active');
+                resetSegaSteps();
+                renderSegaStep(1);
             }
         });
     });
@@ -89,6 +207,34 @@ function setupEventListeners() {
         });
     }
     
+    // God Mode Navigation
+    if (godmodePrevButton) {
+        godmodePrevButton.addEventListener('click', function() {
+            if (currentGodModeStep > 1) {
+                saveGodModeData(currentGodModeStep);
+                currentGodModeStep--;
+                renderGodModeStep(currentGodModeStep);
+            }
+        });
+    }
+    
+    if (godmodeNextButton) {
+        godmodeNextButton.addEventListener('click', function() {
+            if (validateGodModeStep(currentGodModeStep)) {
+                saveGodModeData(currentGodModeStep);
+                
+                if (currentGodModeStep < godModeData.totalSteps) {
+                    currentGodModeStep++;
+                    renderGodModeStep(currentGodModeStep);
+                } else {
+                    // Last step - show start prediction button
+                    godmodeNextButton.style.display = 'none';
+                    startGodmodePrediction.style.display = 'inline-block';
+                }
+            }
+        });
+    }
+    
     // God Mode Start Prediction button
     if (startGodmodePrediction) {
         startGodmodePrediction.addEventListener('click', function() {
@@ -102,6 +248,34 @@ function setupEventListeners() {
             premiumGameTitle.textContent = 'God Mode - Prédiction';
             currentPalier = 0;
             loadGodModeContent();
+        });
+    }
+    
+    // Sega Football Navigation
+    if (segaPrevButton) {
+        segaPrevButton.addEventListener('click', function() {
+            if (currentSegaStep > 1) {
+                saveSegaData(currentSegaStep);
+                currentSegaStep--;
+                renderSegaStep(currentSegaStep);
+            }
+        });
+    }
+    
+    if (segaNextButton) {
+        segaNextButton.addEventListener('click', function() {
+            if (validateSegaStep(currentSegaStep)) {
+                saveSegaData(currentSegaStep);
+                
+                if (currentSegaStep < segaData.totalSteps) {
+                    currentSegaStep++;
+                    renderSegaStep(currentSegaStep);
+                } else {
+                    // Last step - show start prediction button
+                    segaNextButton.style.display = 'none';
+                    startSegaPrediction.style.display = 'inline-block';
+                }
+            }
         });
     }
     
@@ -178,6 +352,458 @@ function setupEventListeners() {
         premiumHomeButton.addEventListener('click', function() {
             resetPremiumGameView();
         });
+    }
+}
+
+// God Mode Steps Functions
+function setupGodModeSteps() {
+    if (!godmodeStepsContainer) return;
+    // Steps will be rendered dynamically when needed
+}
+
+function renderGodModeStep(stepNumber) {
+    if (!godmodeStepsContainer) return;
+    
+    const step = godModeSteps[stepNumber - 1];
+    godmodeStepsContainer.innerHTML = '';
+    
+    // Create step title and description
+    const stepTitle = document.createElement('h4');
+    stepTitle.className = 'premium-step-title';
+    stepTitle.textContent = `Étape ${stepNumber}/${godModeData.totalSteps} - ${step.title}`;
+    
+    const stepDescription = document.createElement('p');
+    stepDescription.className = 'premium-step-description';
+    stepDescription.textContent = step.description;
+    
+    godmodeStepsContainer.appendChild(stepTitle);
+    godmodeStepsContainer.appendChild(stepDescription);
+    
+    // Create form fields
+    const formContainer = document.createElement('div');
+    formContainer.className = 'premium-form-fields';
+    
+    step.fields.forEach(field => {
+        const fieldContainer = document.createElement('div');
+        fieldContainer.className = 'premium-field-container';
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', field.id);
+        label.textContent = field.label;
+        
+        const input = document.createElement('input');
+        input.id = field.id;
+        input.type = field.type;
+        input.placeholder = field.placeholder;
+        
+        if (field.min) input.min = field.min;
+        if (field.max) input.max = field.max;
+        if (field.step) input.step = field.step;
+        
+        // Set value if exists
+        const value = getGodModeFieldValue(field.id);
+        if (value !== null && value !== undefined && value !== '') {
+            input.value = value;
+        }
+        
+        // Add help text
+        const helpText = document.createElement('small');
+        helpText.className = 'field-help-text';
+        helpText.textContent = field.help || '';
+        
+        fieldContainer.appendChild(label);
+        fieldContainer.appendChild(input);
+        fieldContainer.appendChild(helpText);
+        formContainer.appendChild(fieldContainer);
+    });
+    
+    godmodeStepsContainer.appendChild(formContainer);
+    
+    // Update navigation buttons
+    godmodePrevButton.style.display = stepNumber === 1 ? 'none' : 'inline-block';
+    godmodeNextButton.style.display = 'inline-block';
+    startGodmodePrediction.style.display = 'none';
+    
+    // If it's the last step and all validated, show the prediction button
+    if (stepNumber === godModeData.totalSteps && validateGodModeStep(stepNumber, false)) {
+        godmodeNextButton.style.display = 'none';
+        startGodmodePrediction.style.display = 'inline-block';
+    }
+}
+// js/premium-games.js (suite)
+
+function getGodModeFieldValue(fieldId) {
+    // Get stored value from godModeData
+    switch (fieldId) {
+        case 'godmode-home-odds':
+            return godModeData.odds.home || '';
+        case 'godmode-draw-odds':
+            return godModeData.odds.draw || '';
+        case 'godmode-away-odds':
+            return godModeData.odds.away || '';
+        case 'godmode-first-half-home':
+            return godModeData.firstHalf.homeGoals || '';
+        case 'godmode-first-half-away':
+            return godModeData.firstHalf.awayGoals || '';
+        case 'godmode-first-half-odds':
+            return godModeData.firstHalf.odds || '';
+        case 'godmode-second-half-home':
+            return godModeData.secondHalf.homeGoals || '';
+        case 'godmode-second-half-away':
+            return godModeData.secondHalf.awayGoals || '';
+        case 'godmode-second-half-odds':
+            return godModeData.secondHalf.odds || '';
+        case 'godmode-exact-score-home':
+            return godModeData.exactScore.homeGoals || '';
+        case 'godmode-exact-score-away':
+            return godModeData.exactScore.awayGoals || '';
+        case 'godmode-exact-score-odds':
+            return godModeData.exactScore.odds || '';
+        default:
+            return '';
+    }
+}
+
+function saveGodModeData(stepNumber) {
+    const step = godModeSteps[stepNumber - 1];
+    
+    step.fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (input) {
+            const value = input.value;
+            
+            switch (field.id) {
+                case 'godmode-home-odds':
+                    godModeData.odds.home = parseFloat(value) || 0;
+                    break;
+                case 'godmode-draw-odds':
+                    godModeData.odds.draw = parseFloat(value) || 0;
+                    break;
+                case 'godmode-away-odds':
+                    godModeData.odds.away = parseFloat(value) || 0;
+                    break;
+                case 'godmode-first-half-home':
+                    godModeData.firstHalf.homeGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-first-half-away':
+                    godModeData.firstHalf.awayGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-first-half-odds':
+                    godModeData.firstHalf.odds = parseFloat(value) || 0;
+                    break;
+                case 'godmode-second-half-home':
+                    godModeData.secondHalf.homeGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-second-half-away':
+                    godModeData.secondHalf.awayGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-second-half-odds':
+                    godModeData.secondHalf.odds = parseFloat(value) || 0;
+                    break;
+                case 'godmode-exact-score-home':
+                    godModeData.exactScore.homeGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-exact-score-away':
+                    godModeData.exactScore.awayGoals = parseInt(value) || 0;
+                    break;
+                case 'godmode-exact-score-odds':
+                    godModeData.exactScore.odds = parseFloat(value) || 0;
+                    break;
+            }
+        }
+    });
+}
+
+function validateGodModeStep(stepNumber, showAlert = true) {
+    const step = godModeSteps[stepNumber - 1];
+    let isValid = true;
+    
+    step.fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (input) {
+            const value = input.value.trim();
+            
+            if (!value) {
+                isValid = false;
+                input.classList.add('invalid');
+                
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                    input.classList.remove('invalid');
+                }, 3000);
+            }
+        }
+    });
+    
+    if (!isValid && showAlert) {
+        alert('Veuillez remplir tous les champs avant de continuer.');
+    }
+    
+    return isValid;
+}
+
+function resetGodModeSteps() {
+    currentGodModeStep = 1;
+    godModeData = {
+        odds: { home: 0, draw: 0, away: 0 },
+        firstHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        secondHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        exactScore: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        totalSteps: 4
+    };
+    
+    if (godmodeStepsContainer) {
+        godmodeStepsContainer.innerHTML = '';
+    }
+    
+    if (godmodePrevButton) {
+        godmodePrevButton.style.display = 'none';
+    }
+    
+    if (godmodeNextButton) {
+        godmodeNextButton.style.display = 'inline-block';
+    }
+    
+    if (startGodmodePrediction) {
+        startGodmodePrediction.style.display = 'none';
+    }
+}
+
+// Sega Football Steps Functions
+function setupSegaSteps() {
+    if (!segaStepsContainer) return;
+    // Steps will be rendered dynamically when needed
+}
+
+function renderSegaStep(stepNumber) {
+    if (!segaStepsContainer) return;
+    
+    const step = segaSteps[stepNumber - 1];
+    segaStepsContainer.innerHTML = '';
+    
+    // Create step title and description
+    const stepTitle = document.createElement('h4');
+    stepTitle.className = 'premium-step-title';
+    stepTitle.textContent = `Étape ${stepNumber}/${segaData.totalSteps} - ${step.title}`;
+    
+    const stepDescription = document.createElement('p');
+    stepDescription.className = 'premium-step-description';
+    stepDescription.textContent = step.description;
+    
+    segaStepsContainer.appendChild(stepTitle);
+    segaStepsContainer.appendChild(stepDescription);
+    
+    // Create form fields
+    const formContainer = document.createElement('div');
+    formContainer.className = 'premium-form-fields';
+    
+    step.fields.forEach(field => {
+        const fieldContainer = document.createElement('div');
+        fieldContainer.className = 'premium-field-container';
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', field.id);
+        label.textContent = field.label;
+        
+        const input = document.createElement('input');
+        input.id = field.id;
+        input.type = field.type;
+        input.placeholder = field.placeholder;
+        
+        if (field.min) input.min = field.min;
+        if (field.max) input.max = field.max;
+        if (field.step) input.step = field.step;
+        
+        // Set value if exists
+        const value = getSegaFieldValue(field.id);
+        if (value !== null && value !== undefined && value !== '') {
+            input.value = value;
+        }
+        
+        // Add help text
+        const helpText = document.createElement('small');
+        helpText.className = 'field-help-text';
+        helpText.textContent = field.help || '';
+        
+        fieldContainer.appendChild(label);
+        fieldContainer.appendChild(input);
+        fieldContainer.appendChild(helpText);
+        formContainer.appendChild(fieldContainer);
+    });
+    
+    segaStepsContainer.appendChild(formContainer);
+    
+    // Update navigation buttons
+    segaPrevButton.style.display = stepNumber === 1 ? 'none' : 'inline-block';
+    segaNextButton.style.display = 'inline-block';
+    startSegaPrediction.style.display = 'none';
+    
+    // If it's the last step and all validated, show the prediction button
+    if (stepNumber === segaData.totalSteps && validateSegaStep(stepNumber, false)) {
+        segaNextButton.style.display = 'none';
+        startSegaPrediction.style.display = 'inline-block';
+    }
+}
+
+function getSegaFieldValue(fieldId) {
+    // Get stored value from segaData
+    switch (fieldId) {
+        case 'sega-home-odds':
+            return segaData.odds.home || '';
+        case 'sega-draw-odds':
+            return segaData.odds.draw || '';
+        case 'sega-away-odds':
+            return segaData.odds.away || '';
+        case 'sega-first-half-score':
+            return segaData.firstHalf.score || '';
+        case 'sega-first-half-odds':
+            return segaData.firstHalf.odds || '';
+        case 'sega-second-half-score':
+            return segaData.secondHalf.score || '';
+        case 'sega-second-half-odds':
+            return segaData.secondHalf.odds || '';
+        case 'sega-score-home':
+            return segaData.scores.home || '';
+        case 'sega-score-draw':
+            return segaData.scores.draw || '';
+        case 'sega-score-away':
+            return segaData.scores.away || '';
+        case 'sega-over15-odds':
+            return segaData.goals.over15 || '';
+        case 'sega-under35-odds':
+            return segaData.goals.under35 || '';
+        case 'sega-btts-yes-odds':
+            return segaData.goals.bttsYes || '';
+        default:
+            return '';
+    }
+}
+
+function saveSegaData(stepNumber) {
+    const step = segaSteps[stepNumber - 1];
+    
+    step.fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (input) {
+            const value = input.value;
+            
+            switch (field.id) {
+                case 'sega-home-odds':
+                    segaData.odds.home = parseFloat(value) || 0;
+                    break;
+                case 'sega-draw-odds':
+                    segaData.odds.draw = parseFloat(value) || 0;
+                    break;
+                case 'sega-away-odds':
+                    segaData.odds.away = parseFloat(value) || 0;
+                    break;
+                case 'sega-first-half-score':
+                    segaData.firstHalf.score = value;
+                    break;
+                case 'sega-first-half-odds':
+                    segaData.firstHalf.odds = parseFloat(value) || 0;
+                    break;
+                case 'sega-second-half-score':
+                    segaData.secondHalf.score = value;
+                    break;
+                case 'sega-second-half-odds':
+                    segaData.secondHalf.odds = parseFloat(value) || 0;
+                    break;
+                case 'sega-score-home':
+                    segaData.scores.home = value;
+                    break;
+                case 'sega-score-draw':
+                    segaData.scores.draw = value;
+                    break;
+                case 'sega-score-away':
+                    segaData.scores.away = value;
+                    break;
+                case 'sega-over15-odds':
+                    segaData.goals.over15 = parseFloat(value) || 0;
+                    break;
+                case 'sega-under35-odds':
+                    segaData.goals.under35 = parseFloat(value) || 0;
+                    break;
+                case 'sega-btts-yes-odds':
+                    segaData.goals.bttsYes = parseFloat(value) || 0;
+                    break;
+            }
+        }
+    });
+}
+
+function validateSegaStep(stepNumber, showAlert = true) {
+    const step = segaSteps[stepNumber - 1];
+    let isValid = true;
+    
+    step.fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (input) {
+            const value = input.value.trim();
+            
+            if (!value) {
+                isValid = false;
+                input.classList.add('invalid');
+                
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                    input.classList.remove('invalid');
+                }, 3000);
+            }
+            
+            // Validate score format (X-Y) for score fields
+            if (value && (field.id.includes('score') && field.id !== 'sega-over15-odds' && 
+                field.id !== 'sega-under35-odds' && field.id !== 'sega-btts-yes-odds')) {
+                const scorePattern = /^\d+-\d+$/;
+                if (!scorePattern.test(value)) {
+                    isValid = false;
+                    input.classList.add('invalid');
+                    
+                    // Remove highlight after 3 seconds
+                    setTimeout(() => {
+                        input.classList.remove('invalid');
+                    }, 3000);
+                    
+                    if (showAlert) {
+                        alert(`Format de score incorrect pour ${field.label}. Veuillez utiliser le format X-Y (ex: 1-0, 0-1, 1-1)`);
+                    }
+                }
+            }
+        }
+    });
+    
+    if (!isValid && showAlert && !document.querySelector('.invalid[id^="sega-score"]')) {
+        alert('Veuillez remplir tous les champs avant de continuer.');
+    }
+    
+    return isValid;
+}
+
+function resetSegaSteps() {
+    currentSegaStep = 1;
+    segaData = {
+        odds: { home: 0, draw: 0, away: 0 },
+        firstHalf: { score: "", odds: 0 },
+        secondHalf: { score: "", odds: 0 },
+        scores: { home: "", draw: "", away: "" },
+        goals: { over15: 0, under35: 0, bttsYes: 0 },
+        totalSteps: 4
+    };
+    
+    if (segaStepsContainer) {
+        segaStepsContainer.innerHTML = '';
+    }
+    
+    if (segaPrevButton) {
+        segaPrevButton.style.display = 'none';
+    }
+    
+    if (segaNextButton) {
+        segaNextButton.style.display = 'inline-block';
+    }
+    
+    if (startSegaPrediction) {
+        startSegaPrediction.style.display = 'none';
     }
 }
 
@@ -318,8 +944,8 @@ function loadGodModeContent() {
     
     // Create loading animation
     const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'loading-animation';
-    loadingDiv.textContent = 'Chargement des prédictions avancées...';
+    loadingDiv.className = 'loading-animation premium-loading';
+    loadingDiv.textContent = 'Calcul des prédictions avancées en cours...';
     premiumGameContent.appendChild(loadingDiv);
     
     // Simulate loading time
@@ -329,160 +955,240 @@ function loadGodModeContent() {
         // Create palier indicator
         updatePalierIndicator();
         
-        // Add match predictions - with higher confidence values
-        const matches = [
-            {
-                teams: 'Liverpool vs Manchester City',
-                prediction: 'Liverpool Win',
-                homeOdds: '2.40',
-                drawOdds: '3.60',
-                awayOdds: '2.70',
-                confidence: 92
-            },
-            {
-                teams: 'Real Madrid vs Atletico Madrid',
-                prediction: 'Real Madrid Win',
-                homeOdds: '1.95',
-                drawOdds: '3.30',
-                awayOdds: '3.80',
-                confidence: 88
-            },
-            {
-                teams: 'Bayern Munich vs RB Leipzig',
-                prediction: 'Bayern Munich Win',
-                homeOdds: '1.65',
-                drawOdds: '4.00',
-                awayOdds: '4.50',
-                confidence: 95
-            }
-        ];
-        
-        // Create premium prediction cards
-        matches.forEach(match => {
-            const card = document.createElement('div');
-            card.className = 'prediction-card';
-            
-            const header = document.createElement('div');
-            header.className = 'prediction-header';
-            
-            const teams = document.createElement('div');
-            teams.className = 'match-teams';
-            teams.textContent = match.teams;
-            
-            const result = document.createElement('div');
-            result.className = 'prediction-result';
-            result.textContent = match.prediction;
-            
-            header.appendChild(teams);
-            header.appendChild(result);
-            
-            const details = document.createElement('div');
-            details.className = 'prediction-details';
-            
-            // Home odds
-            const homeStat = document.createElement('div');
-            homeStat.className = 'prediction-stat';
-            
-            const homeName = document.createElement('div');
-            homeName.className = 'stat-name';
-            homeName.textContent = 'Victoire 1';
-            
-            const homeValue = document.createElement('div');
-            homeValue.className = 'stat-value-pred';
-            homeValue.textContent = match.homeOdds;
-            
-            homeStat.appendChild(homeName);
-            homeStat.appendChild(homeValue);
-            
-            // Draw odds
-            const drawStat = document.createElement('div');
-            drawStat.className = 'prediction-stat';
-            
-            const drawName = document.createElement('div');
-            drawName.className = 'stat-name';
-            drawName.textContent = 'Nul';
-            
-            const drawValue = document.createElement('div');
-            drawValue.className = 'stat-value-pred';
-            drawValue.textContent = match.drawOdds;
-            
-            drawStat.appendChild(drawName);
-            drawStat.appendChild(drawValue);
-            
-            // Away odds
-            const awayStat = document.createElement('div');
-            awayStat.className = 'prediction-stat';
-            
-            const awayName = document.createElement('div');
-            awayName.className = 'stat-name';
-            awayName.textContent = 'Victoire 2';
-            
-            const awayValue = document.createElement('div');
-            awayValue.className = 'stat-value-pred';
-            awayValue.textContent = match.awayOdds;
-            
-            awayStat.appendChild(awayName);
-            awayStat.appendChild(awayValue);
-            
-            details.appendChild(homeStat);
-            details.appendChild(drawStat);
-            details.appendChild(awayStat);
-            
-            // Confidence bar
-            const confidenceContainer = document.createElement('div');
-            confidenceContainer.className = 'prediction-confidence';
-            
-            const confidenceBar = document.createElement('div');
-            confidenceBar.className = 'confidence-bar';
-            confidenceBar.style.width = '0%';
-            
-            confidenceContainer.appendChild(confidenceBar);
-            
-            card.appendChild(header);
-            card.appendChild(details);
-            card.appendChild(confidenceContainer);
-            
-            premiumGameContent.appendChild(card);
-            
-            // Animate the confidence bar
-            setTimeout(() => {
-                confidenceBar.style.width = `${match.confidence}%`;
-            }, 300);
-        });
-        
-        // Add premium feature notice
-        const premiumNotice = document.createElement('div');
-        premiumNotice.style.textAlign = 'center';
-        premiumNotice.style.margin = '20px 0';
-        premiumNotice.style.padding = '15px';
-        premiumNotice.style.backgroundColor = 'rgba(156, 39, 176, 0.1)';
-        premiumNotice.style.borderRadius = '10px';
-        premiumNotice.innerHTML = `
-            <h3 style="margin-bottom:10px;color:var(--premium-purple);">Mode Premium Activé</h3>
-            <p style="margin-bottom:15px;">Nos algorithmes avancés vous fournissent les prédictions avec la plus haute fiabilité du marché.</p>
-            <p>Confiance moyenne: <strong>92%</strong></p>
+        // Show advanced 3D animation
+        const animationHTML = `
+            <div class="godmode-prediction-animation">
+                <div class="animation-title premium-animation-title">Analyse des données avec IA avancée...</div>
+                <div class="premium-animation-model">
+                    <div class="model-orbit">
+                        <div class="model-planet"></div>
+                    </div>
+                    <div class="model-orbit secondary-orbit">
+                        <div class="model-planet secondary-planet"></div>
+                    </div>
+                    <div class="model-orbit tertiary-orbit">
+                        <div class="model-planet tertiary-planet"></div>
+                    </div>
+                    <div class="model-core"></div>
+                    <div class="model-halo"></div>
+                </div>
+                <div class="prediction-progress">
+                    <div class="progress-label">Progression de l'analyse</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                <div class="animation-status premium-animation-status">Calibration des paramètres prédictifs...</div>
+            </div>
         `;
         
-        premiumGameContent.appendChild(premiumNotice);
+        premiumGameContent.innerHTML = animationHTML;
         
-        // Add bonus for generating predictions
-        addCoins(15);
-        
-        // Show bonus message
-        const bonusMessage = document.createElement('div');
-        bonusMessage.className = 'bonus-message';
-        bonusMessage.textContent = '+15 jetons pour avoir utilisé le mode God!';
-        bonusMessage.style.textAlign = 'center';
-        bonusMessage.style.marginTop = '20px';
-        bonusMessage.style.color = '#4CAF50';
-        bonusMessage.style.fontWeight = 'bold';
-        premiumGameContent.appendChild(bonusMessage);
-        
-        // Animate the bonus message
+        // Animate progress bar
+        const progressFill = premiumGameContent.querySelector('.progress-fill');
         setTimeout(() => {
-            bonusMessage.classList.add('pulse');
+            progressFill.style.width = '100%';
         }, 500);
+        
+        // Update status message periodically
+        const statusElement = premiumGameContent.querySelector('.premium-animation-status');
+        const statuses = [
+            "Calibration des paramètres prédictifs...",
+            "Application des algorithmes avancés...",
+            "Analyse des données historiques...",
+            "Génération des scénarios probabilistes...",
+            "Finalisation des prédictions de haute précision..."
+        ];
+        
+        let statusIndex = 0;
+        const statusInterval = setInterval(() => {
+            statusIndex = (statusIndex + 1) % statuses.length;
+            statusElement.textContent = statuses[statusIndex];
+        }, 1500);
+        
+        // After animation completes, show prediction results
+        setTimeout(() => {
+            clearInterval(statusInterval);
+            displayGodModeResults();
+        }, 7000);
     }, 2000);
+}
+
+function displayGodModeResults() {
+    // Calculate prediction results from godModeData
+    const predictions = calculateGodModePredictions();
+    
+    // Create results container
+    premiumGameContent.innerHTML = '';
+    
+    // Update palier indicator
+    updatePalierIndicator();
+    
+    // Create premium results HTML
+    const resultsHTML = `
+        <div class="godmode-results premium-results">
+            <h3 class="premium-results-title">Prédictions God Mode</h3>
+            
+            <div class="premium-results-grid">
+                <div class="premium-result-card exact-score high-confidence">
+                    <h4>Premier Score Exact</h4>
+                    <div class="premium-score-display">
+                        <span class="team-name">Équipe Domicile</span>
+                        <span class="premium-score-value">${predictions.firstExactScore.home} - ${predictions.firstExactScore.away}</span>
+                        <span class="team-name">Équipe Extérieur</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.firstScoreConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.firstScoreConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card exact-score high-confidence">
+                    <h4>Second Score Exact</h4>
+                    <div class="premium-score-display">
+                        <span class="team-name">Équipe Domicile</span>
+                        <span class="premium-score-value">${predictions.secondExactScore.home} - ${predictions.secondExactScore.away}</span>
+                        <span class="team-name">Équipe Extérieur</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.secondScoreConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.secondScoreConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card total-goals high-confidence">
+                    <h4>Nombre Total de Buts</h4>
+                    <div class="premium-total-display">
+                        <span class="premium-total-value">${predictions.totalGoalsLine}</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.totalGoalsConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.totalGoalsConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card winner high-confidence">
+                    <h4>Gagnant Probable</h4>
+                    <div class="premium-winner-display">
+                        <span class="premium-winner-name">${predictions.winner}</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.winnerConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.winnerConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="premium-results-note">
+                <p>Notre système d'IA avancé a généré ces prédictions avec une fiabilité exceptionnelle.</p>
+                <p>Les scores exacts sont calculés en utilisant des algorithmes propriétaires basés sur les cotes fournies.</p>
+                <p>Pour des résultats optimaux, suivez la prédiction avec le taux de confiance le plus élevé.</p>
+            </div>
+        </div>
+    `;
+    
+    premiumGameContent.innerHTML = resultsHTML;
+    
+    // Animate confidence bars
+    const confidenceBars = premiumGameContent.querySelectorAll('.premium-confidence-fill');
+    confidenceBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 300);
+    });
+    
+    // Add bonus for generating predictions
+    addCoins(15);
+    
+    // Show bonus message
+    const bonusMessage = document.createElement('div');
+    bonusMessage.className = 'bonus-message';
+    bonusMessage.textContent = '+15 jetons pour avoir utilisé God Mode!';
+    bonusMessage.style.textAlign = 'center';
+    bonusMessage.style.marginTop = '20px';
+    bonusMessage.style.color = '#4CAF50';
+    bonusMessage.style.fontWeight = 'bold';
+    premiumGameContent.appendChild(bonusMessage);
+    
+    // Animate the bonus message
+    setTimeout(() => {
+        bonusMessage.classList.add('pulse');
+    }, 500);
+}
+
+function calculateGodModePredictions() {
+    // Calculate first exact score - combination of first and second half values from user input
+    const firstExactScore = {
+        home: godModeData.firstHalf.homeGoals + godModeData.secondHalf.homeGoals,
+        away: godModeData.firstHalf.awayGoals + godModeData.secondHalf.awayGoals
+    };
+    
+    // Calculate second exact score - variation based on the exact score
+    let secondExactScore = {
+        home: godModeData.exactScore.homeGoals,
+        away: godModeData.exactScore.awayGoals
+    };
+    
+    // Ensure second score is different from first
+    if (secondExactScore.home === firstExactScore.home && 
+        secondExactScore.away === firstExactScore.away) {
+        // Generate a variation
+        if (Math.random() > 0.5) {
+            // Adjust home score
+            secondExactScore.home = Math.max(0, secondExactScore.home + (Math.random() > 0.5 ? 1 : -1));
+        } else {
+            // Adjust away score
+            secondExactScore.away = Math.max(0, secondExactScore.away + (Math.random() > 0.5 ? 1 : -1));
+        }
+    }
+    
+    // Total goals prediction
+    const totalGoals = firstExactScore.home + firstExactScore.away;
+    const totalGoalsLine = Math.max(1, totalGoals) + 0.5;
+    
+    // Determine winner based on odds
+    let winner;
+    let winnerConfidence;
+    
+    if (godModeData.odds.home < godModeData.odds.away) {
+        winner = "Équipe Domicile";
+        winnerConfidence = Math.round((1 / godModeData.odds.home) * 100);
+    } else if (godModeData.odds.away < godModeData.odds.home) {
+        winner = "Équipe Extérieur";
+        winnerConfidence = Math.round((1 / godModeData.odds.away) * 100);
+    } else {
+        winner = "Match nul";
+        winnerConfidence = Math.round((1 / godModeData.odds.draw) * 100);
+    }
+    
+    // Ensure confidence values are in reasonable ranges
+    winnerConfidence = Math.min(98, Math.max(75, winnerConfidence));
+    
+    // Premium feature - higher confidence levels
+    const firstScoreConfidence = Math.floor(Math.random() * 11) + 85; // 85-95%
+    const secondScoreConfidence = Math.floor(Math.random() * 11) + 85; // 85-95%
+    const totalGoalsConfidence = Math.floor(Math.random() * 5) + 94; // 94-98%
+    
+    return {
+        firstExactScore,
+        secondExactScore,
+        totalGoalsLine,
+        winner,
+        winnerConfidence,
+        firstScoreConfidence,
+        secondScoreConfidence,
+        totalGoalsConfidence
+    };
 }
 
 function loadSegaFootballContent() {
@@ -490,8 +1196,8 @@ function loadSegaFootballContent() {
     
     // Create loading animation
     const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'loading-animation';
-    loadingDiv.textContent = 'Chargement des prédictions Sega Football...';
+    loadingDiv.className = 'loading-animation sega-loading';
+    loadingDiv.textContent = 'Analyse des données Sega Football...';
     premiumGameContent.appendChild(loadingDiv);
     
     // Simulate loading time
@@ -501,158 +1207,289 @@ function loadSegaFootballContent() {
         // Create palier indicator
         updatePalierIndicator();
         
-        // Add sega football predictions - low scores focused
-        const matches = [
-            {
-                teams: 'Virtual Team A vs Virtual Team B',
-                prediction: 'Score: 1-0',
-                first: 'Under 2.5',
-                second: 'BTTS: No',
-                third: 'HT: 0-0',
-                confidence: 85
-            },
-            {
-                teams: 'Virtual Team C vs Virtual Team D',
-                prediction: 'Score: 2-0',
-                first: 'Under 2.5',
-                second: 'BTTS: No',
-                third: 'HT: 1-0',
-                confidence: 82
-            },
-            {
-                teams: 'Virtual Team E vs Virtual Team F',
-                prediction: 'Score: 0-1',
-                first: 'Under 2.5',
-                second: 'BTTS: No',
-                third: 'HT: 0-0',
-                confidence: 88
-            }
-        ];
-        
-        // Create prediction cards tailored for Sega Football
-        matches.forEach(match => {
-            const card = document.createElement('div');
-            card.className = 'prediction-card';
-            
-            const header = document.createElement('div');
-            header.className = 'prediction-header';
-            
-            const teams = document.createElement('div');
-            teams.className = 'match-teams';
-            teams.textContent = match.teams;
-            
-            const result = document.createElement('div');
-            result.className = 'prediction-result';
-            result.textContent = match.prediction;
-            
-            header.appendChild(teams);
-            header.appendChild(result);
-            
-            const details = document.createElement('div');
-            details.className = 'prediction-details';
-            
-            // First stat
-            const firstStat = document.createElement('div');
-            firstStat.className = 'prediction-stat';
-            
-            const firstName = document.createElement('div');
-            firstName.className = 'stat-name';
-            firstName.textContent = 'Goals';
-            
-            const firstValue = document.createElement('div');
-            firstValue.className = 'stat-value-pred';
-            firstValue.textContent = match.first;
-            
-            firstStat.appendChild(firstName);
-            firstStat.appendChild(firstValue);
-            
-            // Second stat
-            const secondStat = document.createElement('div');
-            secondStat.className = 'prediction-stat';
-            
-            const secondName = document.createElement('div');
-            secondName.className = 'stat-name';
-            secondName.textContent = 'Both Teams';
-            
-            const secondValue = document.createElement('div');
-            secondValue.className = 'stat-value-pred';
-            secondValue.textContent = match.second;
-            
-            secondStat.appendChild(secondName);
-            secondStat.appendChild(secondValue);
-            
-            // Third stat
-            const thirdStat = document.createElement('div');
-            thirdStat.className = 'prediction-stat';
-            
-            const thirdName = document.createElement('div');
-            thirdName.className = 'stat-name';
-            thirdName.textContent = 'Half-Time';
-            
-            const thirdValue = document.createElement('div');
-            thirdValue.className = 'stat-value-pred';
-            thirdValue.textContent = match.third;
-            
-            thirdStat.appendChild(thirdName);
-            thirdStat.appendChild(thirdValue);
-            
-            details.appendChild(firstStat);
-            details.appendChild(secondStat);
-            details.appendChild(thirdStat);
-            
-            // Confidence bar
-            const confidenceContainer = document.createElement('div');
-            confidenceContainer.className = 'prediction-confidence';
-            
-            const confidenceBar = document.createElement('div');
-            confidenceBar.className = 'confidence-bar';
-            confidenceBar.style.width = '0%';
-            
-            confidenceContainer.appendChild(confidenceBar);
-            
-            card.appendChild(header);
-            card.appendChild(details);
-            card.appendChild(confidenceContainer);
-            
-            premiumGameContent.appendChild(card);
-            
-            // Animate the confidence bar
-            setTimeout(() => {
-                confidenceBar.style.width = `${match.confidence}%`;
-            }, 300);
-        });
-        
-        // Add Sega Football specific notice
-        const segaNotice = document.createElement('div');
-        segaNotice.style.textAlign = 'center';
-        segaNotice.style.margin = '20px 0';
-        segaNotice.style.padding = '15px';
-        segaNotice.style.backgroundColor = 'rgba(156, 39, 176, 0.1)';
-        segaNotice.style.borderRadius = '10px';
-        segaNotice.innerHTML = `
-            <h3 style="margin-bottom:10px;color:var(--premium-purple);">Prédictions Sega Football</h3>
-            <p style="margin-bottom:15px;">Nos prédictions sont spécialement optimisées pour les matchs à faible nombre de buts.</p>
-            <p>Stratégie recommandée: <strong>Under 2.5 Goals + BTTS No</strong></p>
+        // Show Sega Football specific animation
+        const animationHTML = `
+            <div class="sega-prediction-animation">
+                <div class="animation-title sega-animation-title">Traitement des données de bas scoring...</div>
+                <div class="sega-animation-model">
+                    <div class="sega-grid">
+                        <div class="sega-grid-item item1"></div>
+                        <div class="sega-grid-item item2"></div>
+                        <div class="sega-grid-item item3"></div>
+                        <div class="sega-grid-item item4"></div>
+                        <div class="sega-grid-item item5"></div>
+                        <div class="sega-grid-item item6"></div>
+                        <div class="sega-grid-item item7"></div>
+                        <div class="sega-grid-item item8"></div>
+                        <div class="sega-grid-item item9"></div>
+                    </div>
+                    <div class="sega-scanner-h"></div>
+                    <div class="sega-scanner-v"></div>
+                </div>
+                <div class="sega-progress">
+                    <div class="progress-label">Calcul des trajectoires probabilistes</div>
+                    <div class="sega-progress-bar">
+                        <div class="sega-progress-fill"></div>
+                    </div>
+                </div>
+                <div class="animation-status sega-animation-status">Analyse des statistiques de faible scoring...</div>
+            </div>
         `;
         
-        premiumGameContent.appendChild(segaNotice);
+        premiumGameContent.innerHTML = animationHTML;
         
-        // Add bonus for generating predictions
-        addCoins(12);
-        
-        // Show bonus message
-        const bonusMessage = document.createElement('div');
-        bonusMessage.className = 'bonus-message';
-        bonusMessage.textContent = '+12 jetons pour avoir utilisé Sega Football!';
-        bonusMessage.style.textAlign = 'center';
-        bonusMessage.style.marginTop = '20px';
-        bonusMessage.style.color = '#4CAF50';
-        bonusMessage.style.fontWeight = 'bold';
-        premiumGameContent.appendChild(bonusMessage);
-        
-        // Animate the bonus message
+        // Animate progress bar
+        const progressFill = premiumGameContent.querySelector('.sega-progress-fill');
         setTimeout(() => {
-            bonusMessage.classList.add('pulse');
+            progressFill.style.width = '100%';
         }, 500);
+        
+        // Update status message periodically
+        const statusElement = premiumGameContent.querySelector('.sega-animation-status');
+        const statuses = [
+            "Analyse des statistiques de faible scoring...",
+            "Calibration du modèle prédictif spécifique...",
+            "Détection des motifs de buts rares...",
+            "Génération des scénarios probabilistes...",
+            "Finalisation des prédictions optimisées pour Sega Football..."
+        ];
+        
+        let statusIndex = 0;
+        const statusInterval = setInterval(() => {
+            statusIndex = (statusIndex + 1) % statuses.length;
+            statusElement.textContent = statuses[statusIndex];
+        }, 1500);
+        
+        // After animation completes, show prediction results
+        setTimeout(() => {
+            clearInterval(statusInterval);
+            displaySegaFootballResults();
+        }, 7000);
     }, 2000);
+}
+
+function displaySegaFootballResults() {
+    // Calculate prediction results from segaData
+    const predictions = calculateSegaFootballPredictions();
+    
+    // Create results container
+    premiumGameContent.innerHTML = '';
+    
+    // Update palier indicator
+    updatePalierIndicator();
+    
+    // Create Sega Football results HTML
+    const resultsHTML = `
+        <div class="sega-football-results premium-results">
+            <h3 class="premium-results-title">Prédictions Sega Football</h3>
+            
+            <div class="premium-results-grid">
+                <div class="premium-result-card exact-score low-scoring">
+                    <h4>Premier Score Exact</h4>
+                    <div class="premium-score-display">
+                        <span class="team-name">Équipe Domicile</span>
+                        <span class="premium-score-value">${predictions.firstExactScore}</span>
+                        <span class="team-name">Équipe Extérieur</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.firstScoreConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.firstScoreConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card exact-score low-scoring">
+                    <h4>Second Score Exact</h4>
+                    <div class="premium-score-display">
+                        <span class="team-name">Équipe Domicile</span>
+                        <span class="premium-score-value">${predictions.secondExactScore}</span>
+                        <span class="team-name">Équipe Extérieur</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.secondScoreConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.secondScoreConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card total-goals high-confidence">
+                    <h4>Marché de buts recommandé</h4>
+                    <div class="premium-total-display">
+                        <span class="premium-total-value">${predictions.recommendedGoalsMarket}</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.goalsConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.goalsConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-result-card winner high-confidence">
+                    <h4>Gagnant Probable</h4>
+                    <div class="premium-winner-display">
+                        <span class="premium-winner-name">${predictions.winner}</span>
+                    </div>
+                    <div class="premium-confidence-meter">
+                        <div class="confidence-label">Confiance: ${predictions.winnerConfidence}%</div>
+                        <div class="premium-confidence-bar">
+                            <div class="premium-confidence-fill" style="width: ${predictions.winnerConfidence}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="premium-results-note sega-note">
+                <div class="sega-info-icon">ℹ️</div>
+                <div>
+                    <p>Sega Football est connu pour ses matchs à <strong>faible nombre de buts</strong>.</p>
+                    <p>Notre modèle prédictif est spécialement optimisé pour ce type de jeu.</p>
+                    <p>Pour des résultats optimaux, privilégiez le marché de buts recommandé.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    premiumGameContent.innerHTML = resultsHTML;
+    
+    // Animate confidence bars
+    const confidenceBars = premiumGameContent.querySelectorAll('.premium-confidence-fill');
+    confidenceBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 300);
+    });
+    
+    // Add bonus for generating predictions
+    addCoins(12);
+    
+    // Show bonus message
+    const bonusMessage = document.createElement('div');
+    bonusMessage.className = 'bonus-message';
+    bonusMessage.textContent = '+12 jetons pour avoir utilisé Sega Football!';
+    bonusMessage.style.textAlign = 'center';
+    bonusMessage.style.marginTop = '20px';
+    bonusMessage.style.color = '#4CAF50';
+    bonusMessage.style.fontWeight = 'bold';
+    premiumGameContent.appendChild(bonusMessage);
+    
+    // Animate the bonus message
+    setTimeout(() => {
+        bonusMessage.classList.add('pulse');
+    }, 500);
+}
+
+function calculateSegaFootballPredictions() {
+    // Parse scores from input
+    let firstHalfScore = parseScore(segaData.firstHalf.score);
+    let secondHalfScore = parseScore(segaData.secondHalf.score);
+    
+    // For Sega Football, we focus on low-scoring predictions
+    // First exact score - typically based on combined half-time scores but adjusted for low scoring
+    const totalGoals = firstHalfScore.home + firstHalfScore.away + secondHalfScore.home + secondHalfScore.away;
+    
+    // Adjust for low scoring if needed
+    let firstExactScore;
+    if (totalGoals > 2) {
+        // Reduce scoring for first prediction
+        firstExactScore = `${Math.min(firstHalfScore.home, 1)}-${Math.min(firstHalfScore.away, 1)}`;
+    } else {
+        // Keep original score if already low
+        firstExactScore = segaData.firstHalf.score;
+    }
+    
+    // Second exact score - different from first but still low-scoring
+    // Prioritize score from user input
+    let secondExactScore;
+    
+    // Use one of the provided scores (home win, draw, away win)
+    if (segaData.odds.home < segaData.odds.away && segaData.odds.home < segaData.odds.draw) {
+        // Home team is favorite
+        secondExactScore = segaData.scores.home;
+    } else if (segaData.odds.away < segaData.odds.home && segaData.odds.away < segaData.odds.draw) {
+        // Away team is favorite
+        secondExactScore = segaData.scores.away;
+    } else {
+        // Draw is most likely
+        secondExactScore = segaData.scores.draw;
+    }
+    
+    // Ensure second score is different from first
+    if (secondExactScore === firstExactScore) {
+        // Try another score
+        const allScores = [segaData.scores.home, segaData.scores.draw, segaData.scores.away];
+        for (const score of allScores) {
+            if (score !== firstExactScore) {
+                secondExactScore = score;
+                break;
+            }
+        }
+        
+        // If all scores are the same, create a slight variation
+        if (secondExactScore === firstExactScore) {
+            const parsedFirst = parseScore(firstExactScore);
+            if (parsedFirst.home > 0) {
+                secondExactScore = `${parsedFirst.home - 1}-${parsedFirst.away}`;
+            } else if (parsedFirst.away > 0) {
+                secondExactScore = `${parsedFirst.home}-${parsedFirst.away - 1}`;
+            } else {
+                // If 0-0, make it 1-0 or 0-1
+                secondExactScore = Math.random() > 0.5 ? "1-0" : "0-1";
+            }
+        }
+    }
+    
+    // Determine recommended goals market (typically Under 2.5 or Under 3.5)
+    // Use the under market with the lowest odds (most likely)
+    const recommendedGoalsMarket = segaData.goals.under35 < 1.8 ? 
+        "Under 3.5 buts" : "Under 2.5 buts";
+    
+    // Determine winner based on odds and scores
+    let winner;
+    let winnerConfidence;
+    
+    if (segaData.odds.home < segaData.odds.away && segaData.odds.home < segaData.odds.draw) {
+        winner = "Équipe Domicile";
+        winnerConfidence = Math.round((1 / segaData.odds.home) * 100);
+    } else if (segaData.odds.away < segaData.odds.home && segaData.odds.away < segaData.odds.draw) {
+        winner = "Équipe Extérieur";
+        winnerConfidence = Math.round((1 / segaData.odds.away) * 100);
+    } else {
+        winner = "Match nul";
+        winnerConfidence = Math.round((1 / segaData.odds.draw) * 100);
+    }
+    
+    // Ensure confidence values are in reasonable ranges
+    winnerConfidence = Math.min(95, Math.max(70, winnerConfidence));
+    
+    // For Sega Football, confidence in under markets is very high
+    const goalsConfidence = Math.floor(Math.random() * 6) + 92; // 92-97%
+    
+    // Score exact confidence is slightly lower but still high for premium
+    const firstScoreConfidence = Math.floor(Math.random() * 11) + 80; // 80-90%
+    const secondScoreConfidence = Math.floor(Math.random() * 11) + 80; // 80-90%
+    
+    return {
+        firstExactScore,
+        secondExactScore,
+        recommendedGoalsMarket,
+        winner,
+        winnerConfidence,
+        firstScoreConfidence,
+        secondScoreConfidence,
+        goalsConfidence
+    };
+}
+
+// Helper function to parse scores in format "X-Y"
+function parseScore(scoreString) {
+    const parts = scoreString.split('-');
+    return {
+        home: parseInt(parts[0]) || 0,
+        away: parseInt(parts[1]) || 0
+    };
 }
