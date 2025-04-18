@@ -26,7 +26,8 @@ let predictionData = {
         odds: 0
     },
     currentStep: 1,
-    totalSteps: 4
+    totalSteps: 4,
+    league: ''
 };
 
 // Questions et structure pour chaque étape
@@ -82,11 +83,12 @@ let predictionButton;
 let animationContainer;
 let resultsContainer;
 
-export function initFifaPredictionSystem(container) {
+export function initFifaPredictionSystem(container, league) {
     predictionContainer = container;
     
     // Reset data
     predictionData.currentStep = 1;
+    predictionData.league = league;
     
     // Create the UI
     createPredictionUI();
@@ -198,6 +200,7 @@ function renderCurrentStep() {
         
         // Add event listener
         input.addEventListener('change', (e) => updateFieldValue(field.id, e.target.value));
+        input.addEventListener('input', (e) => updateFieldValue(field.id, e.target.value));
         
         fieldContainer.appendChild(label);
         fieldContainer.appendChild(input);
@@ -588,7 +591,7 @@ function displayPredictionResults(results) {
 }
 
 function resetPrediction() {
-    // Reset to first step and clear some data
+    // Reset to first step
     predictionData.currentStep = 1;
     
     // Show form elements again
