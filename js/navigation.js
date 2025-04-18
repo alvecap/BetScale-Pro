@@ -10,6 +10,28 @@ export function initNavigation() {
     navButtons = document.querySelectorAll('.nav-button');
     contentSections = document.querySelectorAll('.content-section');
     
+    // Correction de "Jeu" en "Jeux" dans le menu de navigation
+    const jeuNavButton = document.querySelector('.nav-button[data-section="jeu"] span');
+    if (jeuNavButton) {
+        jeuNavButton.textContent = 'Jeux';
+    }
+    
+    // Agrandir légèrement les boutons de navigation
+    document.querySelectorAll('.nav-button .button-content').forEach(btn => {
+        btn.style.width = '85%';
+        btn.style.height = '85%';
+    });
+
+    document.querySelectorAll('.nav-button .icon').forEach(icon => {
+        icon.style.fontSize = '1.6rem';
+        icon.style.marginBottom = '8px';
+    });
+
+    document.querySelectorAll('.nav-button span').forEach(text => {
+        text.style.fontSize = '0.9rem';
+        text.style.fontWeight = '600';
+    });
+    
     // Setup navigation events
     setupNavigationEvents();
     
@@ -116,12 +138,12 @@ function adjustForScreenSize() {
     if (isMobile) {
         // Adjust for mobile screens
         document.querySelectorAll('.nav-button .button-content').forEach(btn => {
-            btn.style.width = '90%';
+            btn.style.width = '92%';
         });
     } else {
         // Adjust for larger screens
         document.querySelectorAll('.nav-button .button-content').forEach(btn => {
-            btn.style.width = '80%';
+            btn.style.width = '85%';
         });
     }
 }
