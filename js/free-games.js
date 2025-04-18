@@ -24,7 +24,6 @@ let backToGamesButton;
 
 // Game state
 let selectedFifaGame = null;
-let advancedPredictionMode = false;
 
 export function initFreeGames() {
     // Initialize DOM elements
@@ -112,18 +111,15 @@ function setupEventListeners() {
                 fifaGames.classList.remove('active');
                 gameInterface.classList.add('active');
                 
-                // Set game title and load content based on which game was selected
+                // Set game title and load content
                 if (selectedFifaGame === 'fifa-england') {
                     gameTitle.textContent = 'FC24 4x4 - Angleterre';
-                    
-                    // We're adding a toggle for the users to choose between regular and advanced prediction
-                    loadFifaGameOptionsUI('england');
-                    
+                    // Lancer directement le système de prédiction avancé
+                    initFifaPredictionSystem(gameContent, 'england');
                 } else if (selectedFifaGame === 'fifa-master') {
                     gameTitle.textContent = 'FC24 3x3 - Master League';
-                    
-                    // Same options for Master League
-                    loadFifaGameOptionsUI('master');
+                    // Lancer directement le système de prédiction avancé
+                    initFifaPredictionSystem(gameContent, 'master');
                 }
             }
         });
@@ -191,363 +187,8 @@ export function resetGameView() {
     // Clear game content
     if (gameContent) gameContent.innerHTML = '';
     
-    // Reset variables
+    // Reset selected game
     resetFifaSelection();
-    advancedPredictionMode = false;
-}
-
-function loadFifaGameOptionsUI(league) {
-    gameContent.innerHTML = '';
-    
-    // Create options UI for selecting prediction mode
-    const optionsHTML = `
-        <div class="fifa-options">
-            <h3>Choisissez votre mode de prédiction</h3>
-            <p>Sélectionnez le type de prédiction que vous souhaitez obtenir</p>
-            
-            <div class="prediction-modes">
-                <div class="prediction-mode-card">
-                    <div class="mode-icon">📊</div>
-                    <h4>Prédiction Standard</h4>
-                    <p>Obtenez rapidement des prédictions basées sur notre intelligence artificielle.</p>
-                    <button class="standard-prediction-button">Choisir</button>
-                </div>
-                
-                <div class="prediction-mode-card premium">
-                    <div class="mode-badge">avancé</div>
-                    <div class="mode-icon">🧠</div>
-                    <h4>Prédiction Avancée</h4>
-                    <p>Notre système le plus avancé avec modèle mathématique et analyse en étapes.</p>
-                    <button class="advanced-prediction-button">Choisir</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    gameContent.innerHTML = optionsHTML;
-    
-    // Add event listeners to the buttons
-    const standardButton = gameContent.querySelector('.standard-prediction-button');
-    const advancedButton = gameContent.querySelector('.advanced-prediction-button');
-    
-    if (standardButton) {
-        standardButton.addEventListener('click', function() {
-            advancedPredictionMode = false;
-            loadFIFAGameContent(league);
-        });
-    }
-    
-    if (advancedButton) {
-        advancedButton.addEventListener('click', function() {
-            advancedPredictionMode = true;
-            // Clear content and initialize advanced prediction system
-            gameContent.innerHTML = '';
-            initFifaPredictionSystem(gameContent);
-        });
-    }
-    
-    // Add styles for the options UI
-    const style = document.createElement('style');
-    style.textContent = `
-        .fifa-options {
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .fifa-options h3 {
-            margin-bottom: 10px;
-            color: var(--secondary-color);
-        }
-        
-        .fifa-options p {
-            color: #666;
-            margin-bottom: 30px;
-        }
-        
-        .prediction-modes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .prediction-mode-card {
-            background-color: #f9f9f9;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
-            position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .prediction-mode-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .prediction-mode-card.premium {
-            background: linear-gradient(135deg, #f0f7ff, #e6f2ff);
-            border: 1px solid rgba(74, 107, 253, 0.2);
-        }
-        
-        .mode-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 3px 10px;
-            border-radius: 20px;
-        }
-        
-        .mode-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        
-        .prediction-mode-card h4 {
-            margin-bottom: 10px;
-            color: var(--secondary-color);
-        }
-        
-        .prediction-mode-card p {
-            margin-bottom: 20px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .standard-prediction-button, .advanced-prediction-button {
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .standard-prediction-button {
-            background-color: #f0f0f0;
-            color: var(--secondary-color);
-            border: 1px solid #ddd;
-        }
-        
-        .standard-prediction-button:hover {
-            background-color: #e6e6e6;
-        }
-        
-        .advanced-prediction-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 8px rgba(74, 107, 253, 0.3);
-        }
-        
-        .advanced-prediction-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(74, 107, 253, 0.4);
-        }
-    `;
-    document.head.appendChild(style);
-}
-
-function loadFIFAGameContent(league) {
-    gameContent.innerHTML = '';
-    
-    // Create loading animation
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'loading-animation';
-    loadingDiv.textContent = 'Chargement des prédictions...';
-    gameContent.appendChild(loadingDiv);
-    
-    // Simulate loading time
-    setTimeout(() => {
-        gameContent.innerHTML = '';
-        
-        // Add match predictions
-        if (league === 'england') {
-            // England 4x4 predictions
-            const matches = [
-                {
-                    teams: 'Manchester United vs Liverpool',
-                    prediction: 'Liverpool Win',
-                    homeOdds: '3.25',
-                    drawOdds: '3.40',
-                    awayOdds: '2.10',
-                    confidence: 78
-                },
-                {
-                    teams: 'Arsenal vs Chelsea',
-                    prediction: 'Draw',
-                    homeOdds: '2.50',
-                    drawOdds: '3.20',
-                    awayOdds: '2.80',
-                    confidence: 65
-                },
-                {
-                    teams: 'Manchester City vs Tottenham',
-                    prediction: 'Manchester City Win',
-                    homeOdds: '1.75',
-                    drawOdds: '3.50',
-                    awayOdds: '4.60',
-                    confidence: 85
-                },
-                {
-                    teams: 'Newcastle vs Aston Villa',
-                    prediction: 'Newcastle Win',
-                    homeOdds: '2.20',
-                    drawOdds: '3.30',
-                    awayOdds: '3.40',
-                    confidence: 70
-                }
-            ];
-            
-            createPredictionCards(matches);
-        } else {
-            // Master League 3x3 predictions
-            const matches = [
-                {
-                    teams: 'Real Madrid vs Barcelona',
-                    prediction: 'Real Madrid Win',
-                    homeOdds: '2.10',
-                    drawOdds: '3.50',
-                    awayOdds: '3.20',
-                    confidence: 75
-                },
-                {
-                    teams: 'Bayern Munich vs Borussia Dortmund',
-                    prediction: 'Bayern Munich Win',
-                    homeOdds: '1.85',
-                    drawOdds: '3.60',
-                    awayOdds: '4.20',
-                    confidence: 80
-                },
-                {
-                    teams: 'PSG vs Marseille',
-                    prediction: 'PSG Win',
-                    homeOdds: '1.65',
-                    drawOdds: '3.80',
-                    awayOdds: '5.00',
-                    confidence: 88
-                }
-            ];
-            
-            createPredictionCards(matches);
-        }
-        
-        // Add bonus for generating predictions
-        addCoins(5);
-        
-        // Show bonus message
-        const bonusMessage = document.createElement('div');
-        bonusMessage.className = 'bonus-message';
-        bonusMessage.textContent = '+5 jetons pour avoir utilisé nos prédictions!';
-        bonusMessage.style.textAlign = 'center';
-        bonusMessage.style.marginTop = '20px';
-        bonusMessage.style.color = '#4CAF50';
-        bonusMessage.style.fontWeight = 'bold';
-        gameContent.appendChild(bonusMessage);
-        
-        // Animate the bonus message
-        setTimeout(() => {
-            bonusMessage.classList.add('pulse');
-        }, 500);
-    }, 2000);
-}
-
-function createPredictionCards(matches) {
-    matches.forEach(match => {
-        const card = document.createElement('div');
-        card.className = 'prediction-card';
-        
-        const header = document.createElement('div');
-        header.className = 'prediction-header';
-        
-        const teams = document.createElement('div');
-        teams.className = 'match-teams';
-        teams.textContent = match.teams;
-        
-        const result = document.createElement('div');
-        result.className = 'prediction-result';
-        result.textContent = match.prediction;
-        
-        header.appendChild(teams);
-        header.appendChild(result);
-        
-        const details = document.createElement('div');
-        details.className = 'prediction-details';
-        
-        // Home odds
-        const homeStat = document.createElement('div');
-        homeStat.className = 'prediction-stat';
-        
-        const homeName = document.createElement('div');
-        homeName.className = 'stat-name';
-        homeName.textContent = 'Victoire 1';
-        
-        const homeValue = document.createElement('div');
-        homeValue.className = 'stat-value-pred';
-        homeValue.textContent = match.homeOdds;
-        
-        homeStat.appendChild(homeName);
-        homeStat.appendChild(homeValue);
-        
-        // Draw odds
-        const drawStat = document.createElement('div');
-        drawStat.className = 'prediction-stat';
-        
-        const drawName = document.createElement('div');
-        drawName.className = 'stat-name';
-        drawName.textContent = 'Nul';
-        
-        const drawValue = document.createElement('div');
-        drawValue.className = 'stat-value-pred';
-        drawValue.textContent = match.drawOdds;
-        
-        drawStat.appendChild(drawName);
-        drawStat.appendChild(drawValue);
-        
-        // Away odds
-        const awayStat = document.createElement('div');
-        awayStat.className = 'prediction-stat';
-        
-        const awayName = document.createElement('div');
-        awayName.className = 'stat-name';
-        awayName.textContent = 'Victoire 2';
-        
-        const awayValue = document.createElement('div');
-        awayValue.className = 'stat-value-pred';
-        awayValue.textContent = match.awayOdds;
-        
-        awayStat.appendChild(awayName);
-        awayStat.appendChild(awayValue);
-        
-        details.appendChild(homeStat);
-        details.appendChild(drawStat);
-        details.appendChild(awayStat);
-        
-        // Confidence bar
-        const confidenceContainer = document.createElement('div');
-        confidenceContainer.className = 'prediction-confidence';
-        
-        const confidenceBar = document.createElement('div');
-        confidenceBar.className = 'confidence-bar';
-        confidenceBar.style.width = '0%';
-        
-        confidenceContainer.appendChild(confidenceBar);
-        
-        card.appendChild(header);
-        card.appendChild(details);
-        card.appendChild(confidenceContainer);
-        
-        gameContent.appendChild(card);
-        
-        // Animate the confidence bar
-        setTimeout(() => {
-            confidenceBar.style.width = `${match.confidence}%`;
-        }, 300);
-    });
 }
 
 function loadBaccaratGameContent(bookmaker) {
@@ -556,125 +197,166 @@ function loadBaccaratGameContent(bookmaker) {
     // Create loading animation
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'loading-animation';
-    loadingDiv.textContent = 'Chargement des prédictions Baccarat...';
+    loadingDiv.textContent = 'Analyse des données Baccarat...';
     gameContent.appendChild(loadingDiv);
     
-    // Simulate loading time
+    // Simulate loading time - montrer l'animation 3D
     setTimeout(() => {
         gameContent.innerHTML = '';
         
-        // Create baccarat table
-        const baccaratTable = document.createElement('div');
-        baccaratTable.className = 'baccarat-table';
-        
-        // Table header
-        const header = document.createElement('div');
-        header.className = 'baccarat-header';
-        header.innerHTML = `<h3>Prédictions Baccarat - ${bookmaker.toUpperCase()}</h3>`;
-        
-        // Predictions
-        const predictions = document.createElement('div');
-        predictions.className = 'baccarat-prediction';
-        
-        // Player box
-        const playerBox = document.createElement('div');
-        playerBox.className = 'prediction-box';
-        playerBox.innerHTML = `
-            <h4>Joueur</h4>
-            <div class="prediction-percentage">38%</div>
+        // Animation 3D
+        const animationHTML = `
+            <div class="prediction-animation">
+                <div class="animation-title">Génération de la prédiction...</div>
+                <div class="animation-model">
+                    <div class="model-sphere">
+                        <div class="model-ring ring1"></div>
+                        <div class="model-ring ring2"></div>
+                        <div class="model-ring ring3"></div>
+                        <div class="model-core"></div>
+                    </div>
+                    <div class="model-stats">
+                        <div class="stat-bar"><div class="stat-progress"></div></div>
+                        <div class="stat-bar"><div class="stat-progress"></div></div>
+                        <div class="stat-bar"><div class="stat-progress"></div></div>
+                    </div>
+                </div>
+                <div class="animation-status">Analyse des cartes en cours...</div>
+            </div>
         `;
         
-        // Banker box
-        const bankerBox = document.createElement('div');
-        bankerBox.className = 'prediction-box highlighted';
-        bankerBox.innerHTML = `
-            <h4>Banquier</h4>
-            <div class="prediction-percentage">51%</div>
-        `;
+        gameContent.innerHTML = animationHTML;
         
-        // Tie box
-        const tieBox = document.createElement('div');
-        tieBox.className = 'prediction-box';
-        tieBox.innerHTML = `
-            <h4>Égalité</h4>
-            <div class="prediction-percentage">11%</div>
-        `;
+        // Add status update animation
+        const statusElement = gameContent.querySelector('.animation-status');
+        const statuses = [
+            "Analyse des cartes en cours...",
+            "Calcul des probabilités...",
+            "Application du modèle mathématique...",
+            "Finalisation de la prédiction..."
+        ];
         
-        predictions.appendChild(playerBox);
-        predictions.appendChild(bankerBox);
-        predictions.appendChild(tieBox);
+        let statusIndex = 0;
+        const statusInterval = setInterval(() => {
+            statusIndex = (statusIndex + 1) % statuses.length;
+            statusElement.textContent = statuses[statusIndex];
+        }, 1000);
         
-        // Baccarat history
-        const historyContainer = document.createElement('div');
-        historyContainer.innerHTML = '<h4 style="text-align:center;margin-bottom:10px;">Historique des 20 derniers tirages</h4>';
-        
-        const history = document.createElement('div');
-        history.className = 'baccarat-history';
-        
-        // Generate random history
-        const outcomes = ['P', 'B', 'T'];
-        const colors = ['history-player', 'history-banker', 'history-tie'];
-        
-        for (let i = 0; i < 20; i++) {
-            const random = Math.random();
-            let outcomeIndex;
+        // Animate stat bars
+        const statBars = gameContent.querySelectorAll('.stat-progress');
+        statBars.forEach(bar => {
+            const finalWidth = Math.random() * 60 + 40; // 40% to 100%
             
-            if (random < 0.45) {
-                outcomeIndex = 1; // Banker (45% chance)
-            } else if (random < 0.85) {
-                outcomeIndex = 0; // Player (40% chance)
-            } else {
-                outcomeIndex = 2; // Tie (15% chance)
-            }
+            // Set initial width
+            bar.style.width = '0%';
             
-            const historyItem = document.createElement('div');
-            historyItem.className = `history-item ${colors[outcomeIndex]}`;
-            historyItem.textContent = outcomes[outcomeIndex];
-            history.appendChild(historyItem);
-        }
+            // Animate to final width
+            setTimeout(() => {
+                bar.style.transition = 'width 3s ease-in-out';
+                bar.style.width = `${finalWidth}%`;
+            }, 500);
+        });
         
-        historyContainer.appendChild(history);
-        
-        // Append all elements to the baccarat table
-        baccaratTable.appendChild(header);
-        baccaratTable.appendChild(predictions);
-        baccaratTable.appendChild(historyContainer);
-        
-        gameContent.appendChild(baccaratTable);
-        
-        // Add recommendation
-        const recommendation = document.createElement('div');
-        recommendation.style.textAlign = 'center';
-        recommendation.style.margin = '20px 0';
-        recommendation.style.padding = '15px';
-        recommendation.style.backgroundColor = 'rgba(255, 193, 7, 0.1)';
-        recommendation.style.borderRadius = '10px';
-        recommendation.innerHTML = `
-            <h3 style="margin-bottom:10px;color:var(--secondary-color);">Recommandation</h3>
-            <p style="margin-bottom:15px;">Notre système d'IA recommande de parier sur le <strong>Banquier</strong> pour le prochain tirage.</p>
-            <p>Cote moyenne: <strong>0.95</strong></p>
-        `;
-        
-        gameContent.appendChild(recommendation);
-        
-        // Add bonus for generating predictions
-        addCoins(5);
-        
-        // Show bonus message
-        const bonusMessage = document.createElement('div');
-        bonusMessage.className = 'bonus-message';
-        bonusMessage.textContent = '+5 jetons pour avoir utilisé nos prédictions!';
-        bonusMessage.style.textAlign = 'center';
-        bonusMessage.style.marginTop = '20px';
-        bonusMessage.style.color = '#4CAF50';
-        bonusMessage.style.fontWeight = 'bold';
-        gameContent.appendChild(bonusMessage);
-        
-        // Animate the bonus message
+        // Après l'animation, afficher les résultats
         setTimeout(() => {
-            bonusMessage.classList.add('pulse');
-        }, 500);
-    }, 2000);
+            clearInterval(statusInterval);
+            
+            // Générer un résultat aléatoire pour Baccarat
+            // Gagnant: Joueur ou Banquier (65% en faveur du banquier)
+            const isPlayerWinner = Math.random() > 0.65;
+            const winner = isPlayerWinner ? 'Joueur' : 'Banquier';
+            
+            // Nombre de points entre 7.5 et 12.5
+            const totalPoints = (Math.random() * 5 + 7.5).toFixed(1);
+            // Convertir au format x.5 pour les paris sportifs
+            const formattedPoints = Math.floor(parseFloat(totalPoints)) + 0.5;
+            
+            // Confiance entre 70% et 90%
+            const confidence = Math.floor(Math.random() * 21) + 70;
+            
+            // Afficher les résultats
+            gameContent.innerHTML = '';
+            
+            const resultsHTML = `
+                <div class="baccarat-results">
+                    <h3>Prédiction Baccarat - ${bookmaker.toUpperCase()}</h3>
+                    
+                    <div class="results-grid">
+                        <div class="result-card winner">
+                            <h4>Gagnant Probable</h4>
+                            <div class="winner-display">
+                                <span class="winner-name">${winner}</span>
+                            </div>
+                            <div class="confidence-meter">
+                                <div class="confidence-label">Confiance: ${confidence}%</div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: ${confidence}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-card total-goals high-confidence">
+                            <h4>Nombre Total de Points</h4>
+                            <div class="total-display">
+                                <span class="total-value">${formattedPoints}</span>
+                            </div>
+                            <div class="confidence-meter">
+                                <div class="confidence-label">Confiance: ${confidence + 5}%</div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: ${confidence + 5}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="results-note">
+                        <p>Le résultat est basé sur l'analyse des tendances récentes et notre modèle prédictif.</p>
+                        <p>Le nombre total de points est notre prédiction avec la plus grande fiabilité.</p>
+                    </div>
+                </div>
+            `;
+            
+            gameContent.innerHTML = resultsHTML;
+            
+            // Add result buttons
+            const resultButtons = document.createElement('div');
+            resultButtons.className = 'result-buttons';
+            
+            const newPredictionButton = document.createElement('button');
+            newPredictionButton.className = 'nav-button';
+            newPredictionButton.textContent = 'Nouvelle prédiction';
+            newPredictionButton.addEventListener('click', function() {
+                loadBaccaratGameContent(bookmaker);
+            });
+            
+            const homeButton = document.createElement('button');
+            homeButton.className = 'nav-button';
+            homeButton.textContent = 'Accueil';
+            homeButton.addEventListener('click', resetGameView);
+            
+            resultButtons.appendChild(newPredictionButton);
+            resultButtons.appendChild(homeButton);
+            gameContent.appendChild(resultButtons);
+            
+            // Add bonus for generating predictions
+            addCoins(5);
+            
+            // Show bonus message
+            const bonusMessage = document.createElement('div');
+            bonusMessage.className = 'bonus-message';
+            bonusMessage.textContent = '+5 jetons pour avoir utilisé nos prédictions!';
+            bonusMessage.style.textAlign = 'center';
+            bonusMessage.style.marginTop = '20px';
+            bonusMessage.style.color = '#4CAF50';
+            bonusMessage.style.fontWeight = 'bold';
+            gameContent.appendChild(bonusMessage);
+            
+            // Animate the bonus message
+            setTimeout(() => {
+                bonusMessage.classList.add('pulse');
+            }, 500);
+        }, 5000); // Fin de l'animation après 5 secondes
+    }, 1000); // Temps initial de chargement
 }
 
 function showBookmakerModal() {
