@@ -1,7 +1,7 @@
 // js/premium-games.js
-// Logique des jeux premium
+// Logique des jeux premium avec intégration admin
 
-import { addCoins, isPremium } from './user.js';
+import { addCoins, isPremium, isAdmin } from './user.js';
 
 // DOM Elements
 let premiumButtons;
@@ -44,7 +44,7 @@ let segaData = {
     totalSteps: 4
 };
 
-// Structure des étapes pour God Mode (similaire à FIFA)
+// Structure des étapes pour God Mode
 const godModeSteps = [
     {
         title: "Cotes classiques (1 - N - 2)",
@@ -153,14 +153,30 @@ export function initPremiumGames() {
     // Initialize God Mode et Sega Football steps
     setupGodModeSteps();
     setupSegaSteps();
+    
+    // Vérifier si l'utilisateur est administrateur
+    if (isAdmin()) {
+        // Ajouter une classe admin à la section VIP
+        const vipSection = document.getElementById('vip-section');
+        if (vipSection) {
+            vipSection.classList.add('admin-interface');
+        }
+        
+        // Modifier les boutons premium
+        document.querySelectorAll('.premium-button').forEach(button => {
+            button.classList.add('admin-button');
+        });
+        
+        console.log('Interface administrateur activée');
+    }
 }
 
 function setupEventListeners() {
     // Premium games: Commencer button click events
     premiumButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Check if user is premium
-            if (!isPremium()) {
+            // Check if user is premium or admin
+            if (!isPremium() && !isAdmin()) {
                 alert('Cette fonctionnalité est réservée aux utilisateurs Premium. Passez Premium pour y accéder!');
                 return;
             }
@@ -172,14 +188,29 @@ function setupEventListeners() {
             // Show appropriate settings
             if (game === 'apple') {
                 appleSettings.classList.add('active');
+                
+                // Si c'est l'administrateur, afficher un badge admin
+                if (isAdmin()) {
+                    showAdminBadge(appleSettings);
+                }
             } else if (game === 'godmode') {
                 godmodeSettings.classList.add('active');
                 resetGodModeSteps();
                 renderGodModeStep(1);
+                
+                // Si c'est l'administrateur, afficher un badge admin
+                if (isAdmin()) {
+                    showAdminBadge(godmodeSettings);
+                }
             } else if (game === 'sega') {
                 segaSettings.classList.add('active');
                 resetSegaSteps();
                 renderSegaStep(1);
+                
+                // Si c'est l'administrateur, afficher un badge admin
+                if (isAdmin()) {
+                    showAdminBadge(segaSettings);
+                }
             }
         });
     });
@@ -355,6 +386,80 @@ function setupEventListeners() {
     }
 }
 
+// Fonction pour afficher un badge administrateur
+function showAdminBadge(container) {
+    // Vérifier si un badge existe déjà
+    if (container.querySelector('.admin-badge')) return;
+    
+    const adminBadge = document.createElement('div');
+    adminBadge.className = 'admin-badge';
+    adminBadge.innerHTML = '<span class="admin-icon">⚙️</span> Accès Admin';
+    
+    // Ajouter le badge au conteneur
+    container.appendChild(adminBadge);
+    
+    // Ajouter un message d'information pour l'administrateur
+    const adminInfo = document.createElement('div');
+    adminInfo.className = 'admin-info';
+    adminInfo.textContent = 'Mode Administrateur: Accès illimité à toutes les fonctionnalités premium.';
+    
+    // Si on est dans les settings, ajouter un accès rapide
+    if (container.id.includes('settings')) {
+        // Créer des contrôles admin
+        const adminControls = document.createElement('div');
+        adminControls.className = 'admin-controls';
+        
+        // Bouton de génération rapide
+        const quickGenButton = document.createElement('button');
+        quickGenButton.textContent = 'Génération Rapide';
+        quickGenButton.addEventListener('click', function() {
+            if (container.id === 'apple-settings') {
+                // Sélectionner automatiquement un bookmaker
+                document.getElementById('apple-melbet').checked = true;
+                startApplePrediction.click();
+            } else if (container.id === 'godmode-settings') {
+                // Remplir automatiquement avec des valeurs par défaut
+                autoFillGodModeData();
+                startGodmodePrediction.click();
+            } else if (container.id === 'sega-settings') {
+                // Remplir automatiquement avec des valeurs par défaut
+                autoFillSegaData();
+                startSegaPrediction.click();
+            }
+        });
+        
+        adminControls.appendChild(quickGenButton);
+        
+        // Ajouter les contrôles admin après le message d'info
+        adminInfo.appendChild(adminControls);
+    }
+    
+    container.appendChild(adminInfo);
+}
+
+// Fonction pour remplir automatiquement les données God Mode (pour l'admin)
+function autoFillGodModeData() {
+    godModeData = {
+        odds: { home: 2.10, draw: 3.50, away: 3.20 },
+        firstHalf: { homeGoals: 1, awayGoals: 0, odds: 4.33 },
+        secondHalf: { homeGoals: 1, awayGoals: 1, odds: 5.25 },
+        exactScore: { homeGoals: 2, awayGoals: 1, odds: 12.00 },
+        totalSteps: 4
+    };
+}
+
+// Fonction pour remplir automatiquement les données Sega Football (pour l'admin)
+function autoFillSegaData() {
+    segaData = {
+        odds: { home: 2.10, draw: 3.50, away: 3.20 },
+        firstHalf: { score: "1-0", odds: 4.33 },
+        secondHalf: { score: "0-1", odds: 5.25 },
+        scores: { home: "1-0", draw: "1-1", away: "0-2" },
+        goals: { over15: 1.40, under35: 1.30, bttsYes: 2.10 },
+        totalSteps: 4
+    };
+}
+
 // God Mode Steps Functions
 function setupGodModeSteps() {
     if (!godmodeStepsContainer) return;
@@ -430,7 +535,6 @@ function renderGodModeStep(stepNumber) {
         startGodmodePrediction.style.display = 'inline-block';
     }
 }
-// js/premium-games.js (suite)
 
 function getGodModeFieldValue(fieldId) {
     // Get stored value from godModeData
@@ -919,12 +1023,13 @@ function loadAppleOfFortuneContent(bookmaker) {
             premiumGameContent.classList.add('result-visible');
             
             // Add bonus for generating predictions
-            addCoins(10);
+            const bonusAmount = isAdmin() ? 100 : 10;
+            addCoins(bonusAmount);
             
             // Show bonus message
             const bonusMessage = document.createElement('div');
             bonusMessage.className = 'bonus-message';
-            bonusMessage.textContent = '+10 jetons pour avoir utilisé nos prédictions premium!';
+            bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé nos prédictions premium!`;
             bonusMessage.style.textAlign = 'center';
             bonusMessage.style.marginTop = '20px';
             bonusMessage.style.color = '#4CAF50';
@@ -935,6 +1040,19 @@ function loadAppleOfFortuneContent(bookmaker) {
             setTimeout(() => {
                 bonusMessage.classList.add('pulse');
             }, 500);
+            
+            // Si c'est l'administrateur, afficher un badge admin
+            if (isAdmin()) {
+                const adminBadge = document.createElement('div');
+                adminBadge.className = 'admin-badge';
+                adminBadge.innerHTML = '<span class="admin-icon">⚙️</span> Accès Admin';
+                premiumGameContent.appendChild(adminBadge);
+                
+                const adminMessage = document.createElement('div');
+                adminMessage.className = 'admin-info';
+                adminMessage.innerHTML = 'Mode Admin: Bonus de 100 jetons appliqué';
+                premiumGameContent.appendChild(adminMessage);
+            }
         }, 5000); // 5 seconds of scanning animation
     }, 2000);
 }
@@ -1108,12 +1226,13 @@ function displayGodModeResults() {
     });
     
     // Add bonus for generating predictions
-    addCoins(15);
+    const bonusAmount = isAdmin() ? 150 : 15;
+    addCoins(bonusAmount);
     
     // Show bonus message
     const bonusMessage = document.createElement('div');
     bonusMessage.className = 'bonus-message';
-    bonusMessage.textContent = '+15 jetons pour avoir utilisé God Mode!';
+    bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé God Mode!`;
     bonusMessage.style.textAlign = 'center';
     bonusMessage.style.marginTop = '20px';
     bonusMessage.style.color = '#4CAF50';
@@ -1124,6 +1243,19 @@ function displayGodModeResults() {
     setTimeout(() => {
         bonusMessage.classList.add('pulse');
     }, 500);
+    
+    // Si c'est l'administrateur, afficher un badge admin
+    if (isAdmin()) {
+        const adminBadge = document.createElement('div');
+        adminBadge.className = 'admin-badge';
+        adminBadge.innerHTML = '<span class="admin-icon">⚙️</span> Accès Admin';
+        premiumGameContent.appendChild(adminBadge);
+        
+        const adminMessage = document.createElement('div');
+        adminMessage.className = 'admin-info';
+        adminMessage.innerHTML = 'Mode Admin: Bonus de 150 jetons appliqué';
+        premiumGameContent.appendChild(adminMessage);
+    }
 }
 
 function calculateGodModePredictions() {
@@ -1365,12 +1497,13 @@ function displaySegaFootballResults() {
     });
     
     // Add bonus for generating predictions
-    addCoins(12);
+    const bonusAmount = isAdmin() ? 120 : 12;
+    addCoins(bonusAmount);
     
     // Show bonus message
     const bonusMessage = document.createElement('div');
     bonusMessage.className = 'bonus-message';
-    bonusMessage.textContent = '+12 jetons pour avoir utilisé Sega Football!';
+    bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé Sega Football!`;
     bonusMessage.style.textAlign = 'center';
     bonusMessage.style.marginTop = '20px';
     bonusMessage.style.color = '#4CAF50';
@@ -1381,6 +1514,19 @@ function displaySegaFootballResults() {
     setTimeout(() => {
         bonusMessage.classList.add('pulse');
     }, 500);
+    
+    // Si c'est l'administrateur, afficher un badge admin
+    if (isAdmin()) {
+        const adminBadge = document.createElement('div');
+        adminBadge.className = 'admin-badge';
+        adminBadge.innerHTML = '<span class="admin-icon">⚙️</span> Accès Admin';
+        premiumGameContent.appendChild(adminBadge);
+        
+        const adminMessage = document.createElement('div');
+        adminMessage.className = 'admin-info';
+        adminMessage.innerHTML = 'Mode Admin: Bonus de 120 jetons appliqué';
+        premiumGameContent.appendChild(adminMessage);
+    }
 }
 
 function calculateSegaFootballPredictions() {
