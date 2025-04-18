@@ -1,0 +1,132 @@
+<!-- Exemple d'implémentation de Sega Football -->
+<div id="sega-steps-container">
+    <!-- Étape 1: Cotes classiques -->
+    <h4 class="premium-step-title">Étape 1/4 - Cotes classiques (1 - N - 2)</h4>
+    <p class="premium-step-description">Ces cotes serviront à identifier le favori du match pour ce jeu à faible nombre de buts.</p>
+    
+    <div class="premium-form-fields">
+        <div class="premium-field-container">
+            <label for="sega-home-odds">Cote victoire domicile</label>
+            <input type="number" id="sega-home-odds" placeholder="Ex: 2.10" step="0.01">
+            <small class="field-help-text">La cote pour la victoire de l'équipe à domicile est particulièrement importante dans Sega Football</small>
+        </div>
+        
+        <div class="premium-field-container">
+            <label for="sega-draw-odds">Cote match nul</label>
+            <input type="number" id="sega-draw-odds" placeholder="Ex: 3.50" step="0.01">
+            <small class="field-help-text">Les matchs nuls sont fréquents dans ce jeu à faible nombre de buts</small>
+        </div>
+        
+        <div class="premium-field-container">
+            <label for="sega-away-odds">Cote victoire extérieur</label>
+            <input type="number" id="sega-away-odds" placeholder="Ex: 3.20" step="0.01">
+            <small class="field-help-text">La cote pour la victoire à l'extérieur aide à identifier les équipes les plus performantes</small>
+        </div>
+    </div>
+</div>
+
+<div class="config-actions">
+    <button id="sega-prev-button" class="premium-button secondary-button" style="display: none;">Précédent</button>
+    <button id="sega-next-button" class="premium-button">Suivant</button>
+    <button id="start-sega-prediction" class="premium-button" style="display: none;">Obtenir la prédiction</button>
+    <button class="back-button">Retour</button>
+</div>
+
+<!-- Résultats de la prédiction Sega Football -->
+<div class="sega-football-results premium-results">
+    <h3 class="premium-results-title">Prédictions Sega Football</h3>
+    
+    <div class="premium-results-grid">
+        <div class="premium-result-card exact-score low-scoring">
+            <h4>Premier Score Exact</h4>
+            <div class="premium-score-display">
+                <span class="team-name">Équipe Domicile</span>
+                <span class="premium-score-value">1-0</span>
+                <span class="team-name">Équipe Extérieur</span>
+            </div>
+            <div class="premium-confidence-meter">
+                <div class="confidence-label">Confiance: 85%</div>
+                <div class="premium-confidence-bar">
+                    <div class="premium-confidence-fill" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="premium-result-card exact-score low-scoring">
+            <h4>Second Score Exact</h4>
+            <div class="premium-score-display">
+                <span class="team-name">Équipe Domicile</span>
+                <span class="premium-score-value">0-0</span>
+                <span class="team-name">Équipe Extérieur</span>
+            </div>
+            <div class="premium-confidence-meter">
+                <div class="confidence-label">Confiance: 82%</div>
+                <div class="premium-confidence-bar">
+                    <div class="premium-confidence-fill" style="width: 82%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="premium-result-card total-goals high-confidence">
+            <h4>Marché de buts recommandé</h4>
+            <div class="premium-total-display">
+                <span class="premium-total-value">Under 2.5 buts</span>
+            </div>
+            <div class="premium-confidence-meter">
+                <div class="confidence-label">Confiance: 95%</div>
+                <div class="premium-confidence-bar">
+                    <div class="premium-confidence-fill" style="width: 95%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="premium-result-card winner high-confidence">
+            <h4>Gagnant Probable</h4>
+            <div class="premium-winner-display">
+                <span class="premium-winner-name">Équipe Domicile</span>
+            </div>
+            <div class="premium-confidence-meter">
+                <div class="confidence-label">Confiance: 80%</div>
+                <div class="premium-confidence-bar">
+                    <div class="premium-confidence-fill" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="premium-results-note sega-note">
+        <div class="sega-info-icon">ℹ️</div>
+        <div>
+            <p>Sega Football est connu pour ses matchs à <strong>faible nombre de buts</strong>.</p>
+            <p>Notre modèle prédictif est spécialement optimisé pour ce type de jeu.</p>
+            <p>Pour des résultats optimaux, privilégiez le marché de buts recommandé.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Animation de prédiction Sega Football -->
+<div class="sega-prediction-animation">
+    <div class="animation-title sega-animation-title">Traitement des données de bas scoring...</div>
+    <div class="sega-animation-model">
+        <div class="sega-grid">
+            <div class="sega-grid-item item1"></div>
+            <div class="sega-grid-item item2"></div>
+            <div class="sega-grid-item item3"></div>
+            <div class="sega-grid-item item4"></div>
+            <div class="sega-grid-item item5"></div>
+            <div class="sega-grid-item item6"></div>
+            <div class="sega-grid-item item7"></div>
+            <div class="sega-grid-item item8"></div>
+            <div class="sega-grid-item item9"></div>
+        </div>
+        <div class="sega-scanner-h"></div>
+        <div class="sega-scanner-v"></div>
+    </div>
+    <div class="sega-progress">
+        <div class="progress-label">Calcul des trajectoires probabilistes</div>
+        <div class="sega-progress-bar">
+            <div class="sega-progress-fill" style="width: 80%"></div>
+        </div>
+    </div>
+    <div class="animation-status sega-animation-status">Détection des motifs de buts rares...</div>
+</div>
