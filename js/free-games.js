@@ -2,6 +2,7 @@
 // Logique des jeux gratuits
 
 import { addCoins, addWin } from './user.js';
+import { initFifaPredictionSystem } from './fifa-prediction-system.js';
 
 // DOM Elements
 let discoverButton;
@@ -23,6 +24,7 @@ let backToGamesButton;
 
 // Game state
 let selectedFifaGame = null;
+let advancedPredictionMode = false;
 
 export function initFreeGames() {
     // Initialize DOM elements
@@ -110,13 +112,18 @@ function setupEventListeners() {
                 fifaGames.classList.remove('active');
                 gameInterface.classList.add('active');
                 
-                // Set game title and load content
+                // Set game title and load content based on which game was selected
                 if (selectedFifaGame === 'fifa-england') {
                     gameTitle.textContent = 'FC24 4x4 - Angleterre';
-                    loadFIFAGameContent('england');
+                    
+                    // We're adding a toggle for the users to choose between regular and advanced prediction
+                    loadFifaGameOptionsUI('england');
+                    
                 } else if (selectedFifaGame === 'fifa-master') {
                     gameTitle.textContent = 'FC24 3x3 - Master League';
-                    loadFIFAGameContent('master');
+                    
+                    // Same options for Master League
+                    loadFifaGameOptionsUI('master');
                 }
             }
         });
@@ -184,8 +191,165 @@ export function resetGameView() {
     // Clear game content
     if (gameContent) gameContent.innerHTML = '';
     
-    // Reset selected game
+    // Reset variables
     resetFifaSelection();
+    advancedPredictionMode = false;
+}
+
+function loadFifaGameOptionsUI(league) {
+    gameContent.innerHTML = '';
+    
+    // Create options UI for selecting prediction mode
+    const optionsHTML = `
+        <div class="fifa-options">
+            <h3>Choisissez votre mode de prédiction</h3>
+            <p>Sélectionnez le type de prédiction que vous souhaitez obtenir</p>
+            
+            <div class="prediction-modes">
+                <div class="prediction-mode-card">
+                    <div class="mode-icon">📊</div>
+                    <h4>Prédiction Standard</h4>
+                    <p>Obtenez rapidement des prédictions basées sur notre intelligence artificielle.</p>
+                    <button class="standard-prediction-button">Choisir</button>
+                </div>
+                
+                <div class="prediction-mode-card premium">
+                    <div class="mode-badge">avancé</div>
+                    <div class="mode-icon">🧠</div>
+                    <h4>Prédiction Avancée</h4>
+                    <p>Notre système le plus avancé avec modèle mathématique et analyse en étapes.</p>
+                    <button class="advanced-prediction-button">Choisir</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    gameContent.innerHTML = optionsHTML;
+    
+    // Add event listeners to the buttons
+    const standardButton = gameContent.querySelector('.standard-prediction-button');
+    const advancedButton = gameContent.querySelector('.advanced-prediction-button');
+    
+    if (standardButton) {
+        standardButton.addEventListener('click', function() {
+            advancedPredictionMode = false;
+            loadFIFAGameContent(league);
+        });
+    }
+    
+    if (advancedButton) {
+        advancedButton.addEventListener('click', function() {
+            advancedPredictionMode = true;
+            // Clear content and initialize advanced prediction system
+            gameContent.innerHTML = '';
+            initFifaPredictionSystem(gameContent);
+        });
+    }
+    
+    // Add styles for the options UI
+    const style = document.createElement('style');
+    style.textContent = `
+        .fifa-options {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .fifa-options h3 {
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .fifa-options p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .prediction-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .prediction-mode-card {
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .prediction-mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prediction-mode-card.premium {
+            background: linear-gradient(135deg, #f0f7ff, #e6f2ff);
+            border: 1px solid rgba(74, 107, 253, 0.2);
+        }
+        
+        .mode-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .prediction-mode-card h4 {
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .prediction-mode-card p {
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .standard-prediction-button, .advanced-prediction-button {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .standard-prediction-button {
+            background-color: #f0f0f0;
+            color: var(--secondary-color);
+            border: 1px solid #ddd;
+        }
+        
+        .standard-prediction-button:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .advanced-prediction-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 8px rgba(74, 107, 253, 0.3);
+        }
+        
+        .advanced-prediction-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(74, 107, 253, 0.4);
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 function loadFIFAGameContent(league) {
@@ -372,7 +536,8 @@ function createPredictionCards(matches) {
         confidenceBar.style.width = '0%';
         
         confidenceContainer.appendChild(confidenceBar);
-      card.appendChild(header);
+        
+        card.appendChild(header);
         card.appendChild(details);
         card.appendChild(confidenceContainer);
         
