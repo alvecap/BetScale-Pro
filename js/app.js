@@ -6,7 +6,8 @@ import { initNavigation } from './navigation.js';
 import { initFreeGames } from './free-games.js';
 import { initPremiumGames } from './premium-games.js';
 import { initUIEffects } from './ui-effects.js';
-import { initPremiumGames } from './sega-football-questions.js
+import { initPremiumGames } from './sega-football-questions.js;
+import { initPremiumGames } from './god-mode-questions.js;
 
 // Importation du système de prédiction FIFA
 import './fifa-prediction-system.js';
