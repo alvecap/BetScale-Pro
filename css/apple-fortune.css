@@ -1,0 +1,313 @@
+/* css/apple-fortune.css */
+/* Styles pour l'animation améliorée d'Apple of Fortune et corrections des boutons */
+
+/* Correction des boutons pour empêcher le débordement */
+.nav-button, 
+.premium-button, 
+.discover-button, 
+.start-button,
+.select-game-button,
+.back-button,
+.next-button,
+.back-to-games-button,
+.upgrade-button,
+.vip-button,
+.bookmaker-link-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 120px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.nav-button .icon, 
+.premium-button .icon, 
+.discover-button .icon, 
+.start-button .icon,
+.select-game-button .icon,
+.back-button .icon,
+.next-button .icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    max-width: 1.2em;
+    max-height: 1.2em;
+    display: inline-block;
+}
+
+/* Correction des boutons de la navigation principale */
+.nav-bar .nav-button .button-content {
+    min-height: 60px;
+    width: 85%;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-bar .nav-button .icon {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.nav-bar .nav-button span {
+    font-size: 0.9rem;
+    max-width: 100%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Animation Apple of Fortune améliorée */
+.apple-fortune-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    padding: 20px;
+}
+
+.fortune-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--premium-purple);
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px rgba(156, 39, 176, 0.2);
+}
+
+.fortune-wheel-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto 40px;
+}
+
+.fortune-wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        #e6c3fb 0% 20%,
+        #d8a9f8 20% 40%,
+        #e6c3fb 40% 60%,
+        #d8a9f8 60% 80%,
+        #e6c3fb 80% 100%
+    );
+    box-shadow: 0 0 20px rgba(156, 39, 176, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center;
+}
+
+.wheel-center {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--premium-purple), #7b1fa2);
+    z-index: 10;
+    box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
+}
+
+.wheel-section {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform-origin: center;
+}
+
+.section1 { transform: rotate(0deg); }
+.section2 { transform: rotate(72deg); }
+.section3 { transform: rotate(144deg); }
+.section4 { transform: rotate(216deg); }
+.section5 { transform: rotate(288deg); }
+
+.wheel-section .apple-icon {
+    position: absolute;
+    top: 60px;
+    font-size: 2rem;
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3));
+}
+
+.wheel-section .section-number {
+    position: absolute;
+    top: 20px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.fortune-pointer {
+    position: absolute;
+    top: -20px;
+    left: calc(50% - 15px);
+    width: 30px;
+    height: 40px;
+    background-color: #e91e63;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    z-index: 5;
+    filter: drop-shadow(0 0 3px rgba(233, 30, 99, 0.5));
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    80% { transform: rotate(720deg); }
+    90% { transform: rotate(718deg); }
+    100% { transform: rotate(720deg); }
+}
+
+.fortune-result {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(156, 39, 176, 0.05);
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.result-title {
+    margin-bottom: 20px;
+    color: var(--premium-purple);
+    font-size: 1.5rem;
+}
+
+.selected-apple {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.big-apple-icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    animation: pulse 2s infinite alternate;
+}
+
+.apple-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--premium-purple);
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+}
+
+.result-message {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #333;
+    margin-top: 15px;
+}
+
+/* Bonus message container pour éviter le problème du message vert */
+.bonus-container {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    position: relative;
+}
+
+.bonus-message {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+    margin: 0 auto;
+    animation: pulse 1.5s infinite alternate;
+}
+
+/* Progress bar pour Apple of Fortune */
+.apple-progress {
+    background-color: rgba(156, 39, 176, 0.1);
+    height: 10px;
+    border-radius: 5px;
+}
+
+.apple-progress .progress-fill {
+    background: linear-gradient(90deg, var(--premium-purple), #e91e63);
+}
+
+/* Paliers arrondis */
+.palier-indicator {
+    margin-bottom: 25px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    border-radius: 20px;
+    display: inline-flex;
+}
+
+.palier-dot {
+    width: 14px;
+    height: 14px;
+    margin: 0 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-button, 
+    .premium-button, 
+    .discover-button, 
+    .start-button,
+    .select-game-button,
+    .back-button,
+    .next-button,
+    .back-to-games-button {
+        padding: 8px 16px;
+        min-width: 100px;
+    }
+    
+    .fortune-wheel-container {
+        width: 250px;
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-button, 
+    .premium-button, 
+    .discover-button, 
+    .start-button,
+    .select-game-button,
+    .back-button,
+    .next-button,
+    .back-to-games-button {
+        padding: 8px 12px;
+        min-width: 80px;
+        font-size: 0.9rem;
+    }
+    
+    .fortune-wheel-container {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .wheel-section .apple-icon {
+        top: 50px;
+        font-size: 1.8rem;
+    }
+}
