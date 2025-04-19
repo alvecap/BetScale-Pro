@@ -10,5 +10,6 @@
 @import 'utilities.css';
 @import 'responsive.css';
 @import 'fifa-prediction.css';
-@import 'game-animations.css';  /* Fichier pour les animations de jeux */
-@import 'admin.css';  /* Nouveau fichier pour les styles admin */
+@import 'game-animations.css';
+@import 'admin.css';
+@import 'apple-fortune.css';  /* Nouveau fichier pour l'animation améliorée et corrections des boutons */
