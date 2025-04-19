@@ -75,7 +75,7 @@
         <h3>Configuration - God Mode</h3>
         <p class="premium-desc">Notre système d'IA le plus avancé pour les prédictions de football avec une précision exceptionnelle</p>
         <div id="godmode-steps-container">
-            <!-- Les étapes seront générées dynamiquement par JavaScript -->
+            <!-- Sera généré dynamiquement par JavaScript -->
         </div>
         <div class="config-actions">
             <button id="godmode-prev-button" class="premium-button secondary-button" style="display: none;">Précédent</button>
@@ -94,7 +94,7 @@
             <div class="info-text">Ce jeu est réputé pour produire très peu de buts. Nos prédictions sont spécialement calibrées pour maximiser vos chances sur ce type de matchs.</div>
         </div>
         <div id="sega-steps-container">
-            <!-- Les étapes seront générées dynamiquement par JavaScript -->
+            <!-- Sera généré dynamiquement par JavaScript -->
         </div>
         <div class="config-actions">
             <button id="sega-prev-button" class="premium-button secondary-button" style="display: none;">Précédent</button>
@@ -131,3 +131,116 @@
         </div>
     </div>
 </section>
+
+<!-- Templates HTML pour les différentes animations et résultats -->
+
+<!-- Template pour l'animation Apple of Fortune -->
+<template id="apple-animation-template">
+    <div class="apple-fortune-animation">
+        <div class="fortune-title">Analyse en cours...</div>
+        
+        <div class="fortune-wheel-container">
+            <div class="fortune-wheel">
+                <div class="wheel-center"></div>
+                <div class="wheel-section section1">
+                    <div class="apple-icon">🍎</div>
+                    <div class="section-number">1</div>
+                </div>
+                <div class="wheel-section section2">
+                    <div class="apple-icon">🍎</div>
+                    <div class="section-number">2</div>
+                </div>
+                <div class="wheel-section section3">
+                    <div class="apple-icon">🍎</div>
+                    <div class="section-number">3</div>
+                </div>
+                <div class="wheel-section section4">
+                    <div class="apple-icon">🍎</div>
+                    <div class="section-number">4</div>
+                </div>
+                <div class="wheel-section section5">
+                    <div class="apple-icon">🍎</div>
+                    <div class="section-number">5</div>
+                </div>
+            </div>
+            <div class="fortune-pointer"></div>
+        </div>
+        
+        <div class="prediction-progress">
+            <div class="progress-label">Analyse en cours</div>
+            <div class="progress-bar apple-progress">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template pour les résultats d'Apple of Fortune -->
+<template id="apple-result-template">
+    <div class="fortune-result">
+        <h3 class="result-title">Prédiction Apple of Fortune</h3>
+        <div class="result-content">
+            <div class="selected-apple">
+                <div class="big-apple-icon">🍎</div>
+                <div class="apple-number">3</div>
+            </div>
+            <div class="result-message">La prédiction indique la pomme 3</div>
+        </div>
+    </div>
+</template>
+
+<!-- Template pour l'animation de God Mode -->
+<template id="godmode-animation-template">
+    <div class="godmode-prediction-animation">
+        <div class="animation-title premium-animation-title">Analyse avec IA avancée...</div>
+        <div class="premium-animation-model">
+            <div class="model-orbit">
+                <div class="model-planet"></div>
+            </div>
+            <div class="model-orbit secondary-orbit">
+                <div class="model-planet secondary-planet"></div>
+            </div>
+            <div class="model-orbit tertiary-orbit">
+                <div class="model-planet tertiary-planet"></div>
+            </div>
+            <div class="model-core"></div>
+            <div class="model-halo"></div>
+        </div>
+        <div class="prediction-progress">
+            <div class="progress-label">Progression de l'analyse</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <div class="animation-status premium-animation-status">Analyse en cours...</div>
+    </div>
+</template>
+
+<!-- Template pour l'animation de Sega Football -->
+<template id="sega-animation-template">
+    <div class="sega-prediction-animation">
+        <div class="animation-title sega-animation-title">Analyse des données de bas scoring...</div>
+        <div class="sega-animation-model">
+            <div class="sega-grid">
+                <div class="sega-grid-item item1"></div>
+                <div class="sega-grid-item item2"></div>
+                <div class="sega-grid-item item3"></div>
+                <div class="sega-grid-item item4"></div>
+                <div class="sega-grid-item item5"></div>
+                <div class="sega-grid-item item6"></div>
+                <div class="sega-grid-item item7"></div>
+                <div class="sega-grid-item item8"></div>
+                <div class="sega-grid-item item9"></div>
+            </div>
+            <div class="sega-scanner-h"></div>
+            <div class="sega-scanner-v"></div>
+        </div>
+        <div class="sega-progress">
+            <div class="progress-label">Analyse en cours</div>
+            <div class="sega-progress-bar">
+                <div class="sega-progress-fill"></div>
+            </div>
+        </div>
+        <div class="animation-status sega-animation-status">Analyse en cours...</div>
+    </div>
+</template>
