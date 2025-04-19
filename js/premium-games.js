@@ -218,15 +218,12 @@ function setupEventListeners() {
     // Apple of Fortune Start Prediction button
     if (startApplePrediction) {
         startApplePrediction.addEventListener('click', function() {
-            // Check if bookmaker is selected (skip for admin)
+            // Check if bookmaker is selected
             const selectedBookmaker = document.querySelector('input[name="apple-bookmaker"]:checked');
-            if (!selectedBookmaker && !isAdmin()) {
+            if (!selectedBookmaker) {
                 alert('Veuillez sélectionner un bookmaker');
                 return;
             }
-            
-            // Pour l'admin, sélectionner automatiquement un bookmaker si aucun n'est choisi
-            const bookmaker = selectedBookmaker ? selectedBookmaker.value : (isAdmin() ? 'melbet' : null);
             
             // Hide settings
             appleSettings.classList.remove('active');
@@ -237,7 +234,7 @@ function setupEventListeners() {
             // Set game title and load content
             premiumGameTitle.textContent = 'Apple of Fortune - Prédiction';
             currentPalier = 0;
-            loadAppleOfFortuneContent(bookmaker);
+            loadAppleOfFortuneContent(selectedBookmaker.value);
         });
     }
     
@@ -254,8 +251,7 @@ function setupEventListeners() {
     
     if (godmodeNextButton) {
         godmodeNextButton.addEventListener('click', function() {
-            // Pour l'admin, validation facultative
-            if (isAdmin() || validateGodModeStep(currentGodModeStep)) {
+            if (validateGodModeStep(currentGodModeStep)) {
                 saveGodModeData(currentGodModeStep);
                 
                 if (currentGodModeStep < godModeData.totalSteps) {
@@ -273,14 +269,6 @@ function setupEventListeners() {
     // God Mode Start Prediction button
     if (startGodmodePrediction) {
         startGodmodePrediction.addEventListener('click', function() {
-            // Pour l'admin, s'assurer que les données sont remplies même si aucune n'a été saisie
-            if (isAdmin()) {
-                // Vérifier si des données existent déjà, sinon utiliser des valeurs par défaut
-                if (godModeData.odds.home === 0 && godModeData.odds.draw === 0 && godModeData.odds.away === 0) {
-                    autoFillGodModeData();
-                }
-            }
-            
             // Hide settings
             godmodeSettings.classList.remove('active');
             
@@ -307,8 +295,7 @@ function setupEventListeners() {
     
     if (segaNextButton) {
         segaNextButton.addEventListener('click', function() {
-            // Pour l'admin, validation facultative
-            if (isAdmin() || validateSegaStep(currentSegaStep)) {
+            if (validateSegaStep(currentSegaStep)) {
                 saveSegaData(currentSegaStep);
                 
                 if (currentSegaStep < segaData.totalSteps) {
@@ -326,14 +313,6 @@ function setupEventListeners() {
     // Sega Football Start Prediction button
     if (startSegaPrediction) {
         startSegaPrediction.addEventListener('click', function() {
-            // Pour l'admin, s'assurer que les données sont remplies même si aucune n'a été saisie
-            if (isAdmin()) {
-                // Vérifier si des données existent déjà, sinon utiliser des valeurs par défaut
-                if (segaData.odds.home === 0 && segaData.odds.draw === 0 && segaData.odds.away === 0) {
-                    autoFillSegaData();
-                }
-            }
-            
             // Hide settings
             segaSettings.classList.remove('active');
             
@@ -407,7 +386,7 @@ function setupEventListeners() {
     }
 }
 
-// Fonctions pour l'accès administrateur
+// Fonctions pour l'accès administrateur - simplifiées, sans génération rapide
 function showAdminBadge(container) {
     // Vérifier si un badge existe déjà
     if (container.querySelector('.admin-badge')) return;
@@ -422,61 +401,9 @@ function showAdminBadge(container) {
     // Ajouter un message d'information pour l'administrateur
     const adminInfo = document.createElement('div');
     adminInfo.className = 'admin-info';
-    adminInfo.textContent = 'Mode Administrateur: Accès illimité à toutes les fonctionnalités premium.';
-    
-    // Si on est dans les settings, ajouter un accès rapide
-    if (container.id.includes('settings')) {
-        // Créer des contrôles admin
-        const adminControls = document.createElement('div');
-        adminControls.className = 'admin-controls';
-        
-        // Bouton de génération rapide
-        const quickGenButton = document.createElement('button');
-        quickGenButton.textContent = 'Génération Rapide';
-        quickGenButton.addEventListener('click', function() {
-            if (container.id === 'apple-settings') {
-                // Sélectionner automatiquement un bookmaker
-                document.getElementById('apple-melbet').checked = true;
-                startApplePrediction.click();
-            } else if (container.id === 'godmode-settings') {
-                // Remplir automatiquement avec des valeurs par défaut
-                autoFillGodModeData();
-                startGodmodePrediction.click();
-            } else if (container.id === 'sega-settings') {
-                // Remplir automatiquement avec des valeurs par défaut
-                autoFillSegaData();
-                startSegaPrediction.click();
-            }
-        });
-        
-        adminControls.appendChild(quickGenButton);
-        
-        // Ajouter les contrôles admin après le message d'info
-        adminInfo.appendChild(adminControls);
-    }
+    adminInfo.textContent = 'Mode Administrateur: Accès aux fonctionnalités premium.';
     
     container.appendChild(adminInfo);
-}
-
-function autoFillGodModeData() {
-    godModeData = {
-        odds: { home: 2.10, draw: 3.50, away: 3.20 },
-        firstHalf: { homeGoals: 1, awayGoals: 0, odds: 4.33 },
-        secondHalf: { homeGoals: 1, awayGoals: 1, odds: 5.25 },
-        exactScore: { homeGoals: 2, awayGoals: 1, odds: 12.00 },
-        totalSteps: 4
-    };
-}
-
-function autoFillSegaData() {
-    segaData = {
-        odds: { home: 2.10, draw: 3.50, away: 3.20 },
-        firstHalf: { score: "1-0", odds: 4.33 },
-        secondHalf: { score: "0-1", odds: 5.25 },
-        scores: { home: "1-0", draw: "1-1", away: "0-2" },
-        goals: { over15: 1.40, under35: 1.30, bttsYes: 2.10 },
-        totalSteps: 4
-    };
 }
 
 // God Mode Steps Functions
@@ -549,7 +476,7 @@ function renderGodModeStep(stepNumber) {
     startGodmodePrediction.style.display = 'none';
     
     // If it's the last step and all validated, show the prediction button
-    if (stepNumber === godModeData.totalSteps && (isAdmin() || validateGodModeStep(stepNumber, false))) {
+    if (stepNumber === godModeData.totalSteps && validateGodModeStep(stepNumber, false)) {
         godmodeNextButton.style.display = 'none';
         startGodmodePrediction.style.display = 'inline-block';
     }
@@ -638,9 +565,6 @@ function saveGodModeData(stepNumber) {
 }
 
 function validateGodModeStep(stepNumber, showAlert = true) {
-    // Pour l'administrateur, la validation est toujours réussie
-    if (isAdmin()) return true;
-    
     const step = godModeSteps[stepNumber - 1];
     let isValid = true;
     
@@ -670,17 +594,13 @@ function validateGodModeStep(stepNumber, showAlert = true) {
 
 function resetGodModeSteps() {
     currentGodModeStep = 1;
-    
-    // Pour l'administrateur, ne pas réinitialiser les données si elles existent déjà
-    if (!isAdmin() || (godModeData.odds.home === 0 && godModeData.odds.draw === 0 && godModeData.odds.away === 0)) {
-        godModeData = {
-            odds: { home: 0, draw: 0, away: 0 },
-            firstHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
-            secondHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
-            exactScore: { homeGoals: 0, awayGoals: 0, odds: 0 },
-            totalSteps: 4
-        };
-    }
+    godModeData = {
+        odds: { home: 0, draw: 0, away: 0 },
+        firstHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        secondHalf: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        exactScore: { homeGoals: 0, awayGoals: 0, odds: 0 },
+        totalSteps: 4
+    };
     
     if (godmodeStepsContainer) {
         godmodeStepsContainer.innerHTML = '';
@@ -769,7 +689,7 @@ function renderSegaStep(stepNumber) {
     startSegaPrediction.style.display = 'none';
     
     // If it's the last step and all validated, show the prediction button
-    if (stepNumber === segaData.totalSteps && (isAdmin() || validateSegaStep(stepNumber, false))) {
+    if (stepNumber === segaData.totalSteps && validateSegaStep(stepNumber, false)) {
         segaNextButton.style.display = 'none';
         startSegaPrediction.style.display = 'inline-block';
     }
@@ -863,9 +783,6 @@ function saveSegaData(stepNumber) {
 }
 
 function validateSegaStep(stepNumber, showAlert = true) {
-    // Pour l'administrateur, la validation est toujours réussie
-    if (isAdmin()) return true;
-    
     const step = segaSteps[stepNumber - 1];
     let isValid = true;
     
@@ -914,18 +831,14 @@ function validateSegaStep(stepNumber, showAlert = true) {
 
 function resetSegaSteps() {
     currentSegaStep = 1;
-    
-    // Pour l'administrateur, ne pas réinitialiser les données si elles existent déjà
-    if (!isAdmin() || (segaData.odds.home === 0 && segaData.odds.draw === 0 && segaData.odds.away === 0)) {
-        segaData = {
-            odds: { home: 0, draw: 0, away: 0 },
-            firstHalf: { score: "", odds: 0 },
-            secondHalf: { score: "", odds: 0 },
-            scores: { home: "", draw: "", away: "" },
-            goals: { over15: 0, under35: 0, bttsYes: 0 },
-            totalSteps: 4
-        };
-    }
+    segaData = {
+        odds: { home: 0, draw: 0, away: 0 },
+        firstHalf: { score: "", odds: 0 },
+        secondHalf: { score: "", odds: 0 },
+        scores: { home: "", draw: "", away: "" },
+        goals: { over15: 0, under35: 0, bttsYes: 0 },
+        totalSteps: 4
+    };
     
     if (segaStepsContainer) {
         segaStepsContainer.innerHTML = '';
@@ -966,6 +879,9 @@ export function resetPremiumGameView() {
         premiumNextButton.disabled = false;
         premiumNextButton.style.opacity = '1';
     }
+    
+    // Supprimer tous les messages temporaires des précédentes prédictions
+    document.querySelectorAll('.bonus-message').forEach(el => el.remove());
 }
 
 function updatePalierIndicator() {
@@ -992,6 +908,7 @@ function updatePalierIndicator() {
     premiumGameContent.insertBefore(palierIndicator, premiumGameContent.firstChild);
 }
 
+// Nouvelle animation améliorée pour Apple of Fortune
 function loadAppleOfFortuneContent(bookmaker) {
     premiumGameContent.innerHTML = '';
     
@@ -1016,82 +933,121 @@ function loadAppleOfFortuneContent(bookmaker) {
             premiumGameContent.appendChild(adminBadge);
         }
         
-        // Create apples container
-        const applesContainer = document.createElement('div');
-        applesContainer.className = 'apples-container';
+        // Nouvel HTML pour l'animation Apple of Fortune améliorée
+        const appleAnimationHtml = `
+            <div class="apple-fortune-animation">
+                <div class="fortune-title">Prédiction en cours...</div>
+                
+                <div class="fortune-wheel-container">
+                    <div class="fortune-wheel">
+                        <div class="wheel-center"></div>
+                        <div class="wheel-section section1">
+                            <div class="apple-icon">🍎</div>
+                            <div class="section-number">1</div>
+                        </div>
+                        <div class="wheel-section section2">
+                            <div class="apple-icon">🍎</div>
+                            <div class="section-number">2</div>
+                        </div>
+                        <div class="wheel-section section3">
+                            <div class="apple-icon">🍎</div>
+                            <div class="section-number">3</div>
+                        </div>
+                        <div class="wheel-section section4">
+                            <div class="apple-icon">🍎</div>
+                            <div class="section-number">4</div>
+                        </div>
+                        <div class="wheel-section section5">
+                            <div class="apple-icon">🍎</div>
+                            <div class="section-number">5</div>
+                        </div>
+                    </div>
+                    <div class="fortune-pointer"></div>
+                </div>
+                
+                <div class="prediction-progress">
+                    <div class="progress-label">Analyse des données en cours</div>
+                    <div class="progress-bar apple-progress">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fortune-result" style="display: none;">
+                <h3 class="result-title">Prédiction Apple of Fortune</h3>
+                <div class="result-content">
+                    <div class="selected-apple">
+                        <div class="big-apple-icon">🍎</div>
+                        <div class="apple-number"></div>
+                    </div>
+                    <div class="result-message"></div>
+                </div>
+            </div>
+        `;
         
-        // Create 5 apple cases
-        for (let i = 1; i <= 5; i++) {
-            const appleCase = document.createElement('div');
-            appleCase.className = 'apple-case';
-            appleCase.innerHTML = `
-                <div class="apple-icon">🍎</div>
-                <div class="case-number">${i}</div>
-            `;
-            applesContainer.appendChild(appleCase);
-        }
+        premiumGameContent.innerHTML += appleAnimationHtml;
         
-        // Add scanner element
-        const scanner = document.createElement('div');
-        scanner.className = 'scanner';
-        applesContainer.appendChild(scanner);
+        // Animer la roue de la fortune
+        const wheel = premiumGameContent.querySelector('.fortune-wheel');
+        const progressFill = premiumGameContent.querySelector('.progress-fill');
         
-        premiumGameContent.appendChild(applesContainer);
+        // Démarrer l'animation de la roue
+        wheel.style.animation = 'spin 5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards';
         
-        // Create result message (hidden initially)
-        const resultMessage = document.createElement('div');
-        resultMessage.className = 'result-message';
-        resultMessage.textContent = 'Analyse terminée...';
-        premiumGameContent.appendChild(resultMessage);
-        
-        // Start scanning animation
-        applesContainer.classList.add('scanning');
-        
-        // After scanning, show the result
+        // Animer la barre de progression
+        progressFill.style.width = '0%';
         setTimeout(() => {
-            // Remove scanning class
-            applesContainer.classList.remove('scanning');
+            progressFill.style.transition = 'width 5s ease-in-out';
+            progressFill.style.width = '100%';
+        }, 100);
+        
+        // Déterminer la pomme gagnante (résultat)
+        const winningNumber = Math.floor(Math.random() * 5) + 1;
+        
+        // Après l'animation, afficher le résultat
+        setTimeout(() => {
+            // Cacher l'animation
+            const animation = premiumGameContent.querySelector('.apple-fortune-animation');
+            animation.style.display = 'none';
             
-            // Randomly select a winning apple
-            const winningCase = Math.floor(Math.random() * 5) + 1;
+            // Afficher le résultat
+            const result = premiumGameContent.querySelector('.fortune-result');
+            result.style.display = 'block';
             
-            // Highlight the winning apple
-            const appleCases = document.querySelectorAll('.apple-case');
-            appleCases[winningCase - 1].classList.add('selected');
+            // Mettre à jour le numéro de la pomme gagnante
+            const appleNumber = result.querySelector('.apple-number');
+            appleNumber.textContent = winningNumber;
             
-            // Update and show result message
-            resultMessage.textContent = `Prédiction : Case ${winningCase}`;
-            premiumGameContent.classList.add('result-visible');
+            // Mettre à jour le message de résultat
+            const resultMessage = result.querySelector('.result-message');
+            resultMessage.textContent = `La prédiction indique la pomme ${winningNumber}`;
             
-            // Add bonus for generating predictions (plus élevé pour l'admin)
-            const bonusAmount = isAdmin() ? 50 : 10;
+            // Ajouter des jetons au joueur (différent selon le statut admin)
+            const bonusAmount = isAdmin() ? 25 : 10;
             addCoins(bonusAmount);
             
-            // Show bonus message
-            const bonusMessage = document.createElement('div');
-            bonusMessage.className = 'bonus-message';
-            bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé nos prédictions premium!`;
-            bonusMessage.style.textAlign = 'center';
-            bonusMessage.style.marginTop = '20px';
-            bonusMessage.style.color = '#4CAF50';
-            bonusMessage.style.fontWeight = 'bold';
-            premiumGameContent.appendChild(bonusMessage);
+            // Afficher un message de bonus
+            const bonusContainer = document.createElement('div');
+            bonusContainer.className = 'bonus-container';
+            bonusContainer.innerHTML = `
+                <div class="bonus-message">
+                    +${bonusAmount} jetons pour avoir utilisé Apple of Fortune!
+                </div>
+            `;
             
-            // Animate the bonus message
-            setTimeout(() => {
-                bonusMessage.classList.add('pulse');
-            }, 500);
+            premiumGameContent.appendChild(bonusContainer);
             
-            // Pour l'administrateur, afficher un message spécial
+            // Afficher un message spécial pour l'administrateur si nécessaire
             if (isAdmin()) {
                 const adminMessage = document.createElement('div');
                 adminMessage.className = 'admin-info';
                 adminMessage.textContent = 'Mode Admin: Bonus de jetons augmenté!';
                 premiumGameContent.appendChild(adminMessage);
             }
-        }, 5000); // 5 seconds of scanning animation
-    }, 2000);
+        }, 5000);
+    }, 1500);
 }
+
 function loadGodModeContent() {
     premiumGameContent.innerHTML = '';
     
@@ -1143,7 +1099,7 @@ function loadGodModeContent() {
             </div>
         `;
         
-        premiumGameContent.innerHTML = animationHTML;
+        premiumGameContent.innerHTML += animationHTML;
         
         // Animate progress bar
         const progressFill = premiumGameContent.querySelector('.progress-fill');
@@ -1174,7 +1130,6 @@ function loadGodModeContent() {
         }, 7000);
     }, 2000);
 }
-
 function displayGodModeResults() {
     // Calculate prediction results from godModeData
     const predictions = calculateGodModePredictions();
@@ -1276,24 +1231,20 @@ function displayGodModeResults() {
         }, 300);
     });
     
-    // Add bonus for generating predictions (plus élevé pour l'admin)
-    const bonusAmount = isAdmin() ? 75 : 15;
+    // Add bonus for generating predictions
+    const bonusAmount = isAdmin() ? 25 : 15;
     addCoins(bonusAmount);
     
-    // Show bonus message
-    const bonusMessage = document.createElement('div');
-    bonusMessage.className = 'bonus-message';
-    bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé God Mode!`;
-    bonusMessage.style.textAlign = 'center';
-    bonusMessage.style.marginTop = '20px';
-    bonusMessage.style.color = '#4CAF50';
-    bonusMessage.style.fontWeight = 'bold';
-    premiumGameContent.appendChild(bonusMessage);
+    // Show bonus message in container
+    const bonusContainer = document.createElement('div');
+    bonusContainer.className = 'bonus-container';
+    bonusContainer.innerHTML = `
+        <div class="bonus-message">
+            +${bonusAmount} jetons pour avoir utilisé God Mode!
+        </div>
+    `;
     
-    // Animate the bonus message
-    setTimeout(() => {
-        bonusMessage.classList.add('pulse');
-    }, 500);
+    premiumGameContent.appendChild(bonusContainer);
     
     // Pour l'administrateur, afficher un message spécial
     if (isAdmin()) {
@@ -1349,16 +1300,13 @@ function calculateGodModePredictions() {
         winnerConfidence = Math.round((1 / godModeData.odds.draw) * 100);
     }
     
-    // Pour l'administrateur, augmenter légèrement les indices de confiance
-    const adminBonus = isAdmin() ? 5 : 0;
-    
     // Ensure confidence values are in reasonable ranges
-    winnerConfidence = Math.min(98, Math.max(75, winnerConfidence + adminBonus));
+    winnerConfidence = Math.min(98, Math.max(75, winnerConfidence));
     
     // Premium feature - higher confidence levels
-    const firstScoreConfidence = Math.floor(Math.random() * 11) + 85 + adminBonus; // 85-95% (+admin bonus)
-    const secondScoreConfidence = Math.floor(Math.random() * 11) + 85 + adminBonus; // 85-95% (+admin bonus)
-    const totalGoalsConfidence = Math.floor(Math.random() * 5) + 94 + adminBonus; // 94-98% (+admin bonus)
+    const firstScoreConfidence = Math.floor(Math.random() * 11) + 85; // 85-95%
+    const secondScoreConfidence = Math.floor(Math.random() * 11) + 85; // 85-95%
+    const totalGoalsConfidence = Math.floor(Math.random() * 5) + 94; // 94-98%
     
     return {
         firstExactScore,
@@ -1399,7 +1347,7 @@ function loadSegaFootballContent() {
         // Show Sega Football specific animation
         const animationHTML = `
             <div class="sega-prediction-animation">
-                <div class="animation-title sega-animation-title">Traitement des données de bas scoring...</div>
+            <div class="animation-title sega-animation-title">Traitement des données de bas scoring...</div>
                 <div class="sega-animation-model">
                     <div class="sega-grid">
                         <div class="sega-grid-item item1"></div>
@@ -1425,7 +1373,7 @@ function loadSegaFootballContent() {
             </div>
         `;
         
-        premiumGameContent.innerHTML = animationHTML;
+        premiumGameContent.innerHTML += animationHTML;
         
         // Animate progress bar
         const progressFill = premiumGameContent.querySelector('.sega-progress-fill');
@@ -1561,24 +1509,20 @@ function displaySegaFootballResults() {
         }, 300);
     });
     
-    // Add bonus for generating predictions (plus élevé pour l'admin)
-    const bonusAmount = isAdmin() ? 60 : 12;
+    // Add bonus for generating predictions
+    const bonusAmount = isAdmin() ? 20 : 12;
     addCoins(bonusAmount);
     
-    // Show bonus message
-    const bonusMessage = document.createElement('div');
-    bonusMessage.className = 'bonus-message';
-    bonusMessage.textContent = `+${bonusAmount} jetons pour avoir utilisé Sega Football!`;
-    bonusMessage.style.textAlign = 'center';
-    bonusMessage.style.marginTop = '20px';
-    bonusMessage.style.color = '#4CAF50';
-    bonusMessage.style.fontWeight = 'bold';
-    premiumGameContent.appendChild(bonusMessage);
+    // Show bonus message in container
+    const bonusContainer = document.createElement('div');
+    bonusContainer.className = 'bonus-container';
+    bonusContainer.innerHTML = `
+        <div class="bonus-message">
+            +${bonusAmount} jetons pour avoir utilisé Sega Football!
+        </div>
+    `;
     
-    // Animate the bonus message
-    setTimeout(() => {
-        bonusMessage.classList.add('pulse');
-    }, 500);
+    premiumGameContent.appendChild(bonusContainer);
     
     // Pour l'administrateur, afficher un message spécial
     if (isAdmin()) {
@@ -1682,18 +1626,15 @@ function calculateSegaFootballPredictions() {
         winnerConfidence = Math.round((1 / segaData.odds.draw) * 100);
     }
     
-    // Pour l'administrateur, augmenter légèrement les indices de confiance
-    const adminBonus = isAdmin() ? 5 : 0;
-    
     // Ensure confidence values are in reasonable ranges
-    winnerConfidence = Math.min(95, Math.max(70, winnerConfidence + adminBonus));
+    winnerConfidence = Math.min(95, Math.max(70, winnerConfidence));
     
     // For Sega Football, confidence in under markets is very high
-    const goalsConfidence = Math.floor(Math.random() * 6) + 92 + adminBonus; // 92-97% (+admin bonus)
+    const goalsConfidence = Math.floor(Math.random() * 6) + 92; // 92-97%
     
     // Score exact confidence is slightly lower but still high for premium
-    const firstScoreConfidence = Math.floor(Math.random() * 11) + 80 + adminBonus; // 80-90% (+admin bonus)
-    const secondScoreConfidence = Math.floor(Math.random() * 11) + 80 + adminBonus; // 80-90% (+admin bonus)
+    const firstScoreConfidence = Math.floor(Math.random() * 11) + 80; // 80-90%
+    const secondScoreConfidence = Math.floor(Math.random() * 11) + 80; // 80-90%
     
     return {
         firstExactScore,
